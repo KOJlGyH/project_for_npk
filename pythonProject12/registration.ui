@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Segoe UI</family>
+    <pointsize>-1</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">/* General Settings */
+QWidget {
+    font-family: &quot;Segoe UI&quot;;
+    font-size: 14px;
+    color: #2c3e50; /* Dark blue for text */
+    background-color: #ecf0f1; /* Light gray background */
+}
+
+/* Buttons */
+QPushButton {
+    background-color: #3498db; /* Blue */
+    color: white;
+    border: 1px solid #2980b9; /* Darker blue */
+    border-radius: 5px;
+    padding: 8px 16px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    background-color: #2980b9; /* Darker blue on hover */
+}
+
+QPushButton:pressed {
+    background-color: #1c5980; /* Even darker blue when pressed */
+}
+
+QPushButton:disabled {
+    background-color: #bdc3c7; /* Gray */
+    color: #7f8c8d; /* Light gray text */
+    border: 1px solid #95a5a6;
+}
+
+/* Line Edits */
+QLineEdit {
+    background-color: white;
+    border: 1px solid #bdc3c7; /* Light gray border */
+    border-radius: 5px;
+    padding: 8px;
+}
+
+QLineEdit:focus {
+    border: 1px solid #3498db; /* Blue border when focused */
+}
+
+/* Labels */
+QLabel {
+    color: #2c3e50; /* Dark blue */
+    font-size: 14px;
+}
+
+QLabel#titleLabel {
+    font-size: 18px;
+    font-weight: bold;
+    color: #3498db; /* Blue for titles */
+}
+
+/* Combo Boxes */
+QComboBox {
+    background-color: white;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    padding: 8px;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 25px;
+    border-left: 1px solid #bdc3c7;
+}
+
+QComboBox::down-arrow {
+    image: url(:/icons/down_arrow.png); /* Replace with your icon */
+}
+
+QComboBox QAbstractItemView {
+    background-color: white;
+    border: 1px solid #bdc3c7;
+    selection-background-color: #3498db; /* Blue for selected item */
+    selection-color: white;
+}
+
+/* Check Boxes */
+QCheckBox {
+    color: #2c3e50;
+}
+
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+}
+
+QCheckBox::indicator:checked {
+    image: url(:/icons/checked.png); /* Replace with your icon */
+}
+
+QCheckBox::indicator:unchecked {
+    image: url(:/icons/unchecked.png); /* Replace with your icon */
+}
+
+/* Radio Buttons */
+QRadioButton {
+    color: #2c3e50;
+}
+
+QRadioButton::indicator {
+    width: 16px;
+    height: 16px;
+}
+
+QRadioButton::indicator:checked {
+    image: url(:/icons/radio_checked.png); /* Replace with your icon */
+}
+
+QRadioButton::indicator:unchecked {
+    image: url(:/icons/radio_unchecked.png); /* Replace with your icon */
+}
+
+/* Progress Bars */
+QProgressBar {
+    background-color: #bdc3c7;
+    border: 1px solid #95a5a6;
+    border-radius: 5px;
+    text-align: center;
+    color: #2c3e50;
+}
+
+QProgressBar::chunk {
+    background-color: #3498db; /* Blue */
+    border-radius: 5px;
+}
+
+/* Spin Boxes */
+QSpinBox {
+    background-color: white;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    padding: 8px;
+}
+
+QSpinBox::up-button, QSpinBox::down-button {
+    subcontrol-origin: border;
+    subcontrol-position: top right;
+    width: 20px;
+    border-left: 1px solid #bdc3c7;
+}
+
+QSpinBox::up-arrow {
+    image: url(:/icons/up_arrow.png); /* Replace with your icon */
+}
+
+QSpinBox::down-arrow {
+    image: url(:/icons/down_arrow.png); /* Replace with your icon */
+}
+
+/* Group Boxes */
+QGroupBox {
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    margin-top: 10px;
+    padding-top: 15px;
+    font-weight: bold;
+    color: #3498db; /* Blue for group box titles */
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 0 5px;
+}
+
+/* Tabs */
+QTabWidget::pane {
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+QTabBar::tab {
+    background-color: #ecf0f1;
+    border: 1px solid #bdc3c7;
+    border-bottom: none;
+    padding: 8px 16px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+QTabBar::tab:selected {
+    background-color: white;
+    border-bottom: 1px solid white;
+}
+
+QTabBar::tab:hover {
+    background-color: #3498db; /* Blue on hover */
+    color: white;
+}
+
+/* Scroll Bars */
+QScrollBar:horizontal, QScrollBar:vertical {
+    background-color: #ecf0f1;
+    border-radius: 5px;
+}
+
+QScrollBar::handle:horizontal, QScrollBar::handle:vertical {
+    background-color: #3498db; /* Blue */
+    border-radius: 5px;
+}
+
+QScrollBar::add-line, QScrollBar::sub-line {
+    background: none;
+}
+
+/* Tool Tips */
+QToolTip {
+    background-color: #3498db; /* Blue */
+    color: white;
+    border: 1px solid #2980b9;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+/* Menus */
+QMenuBar {
+    background-color: #ecf0f1;
+    color: #2c3e50;
+}
+
+QMenuBar::item {
+    padding: 8px 16px;
+}
+
+QMenuBar::item:selected {
+    background-color: #3498db; /* Blue */
+    color: white;
+}
+
+QMenu {
+    background-color: white;
+    border: 1px solid #bdc3c7;
+    padding: 5px;
+}
+
+QMenu::item {
+    padding: 8px 16px;
+}
+
+QMenu::item:selected {
+    background-color: #3498db; /* Blue */
+    color: white;
+}
+
+/* Tables */
+QTableView {
+    background-color: white;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+}
+
+QTableView::item {
+    padding: 8px;
+}
+
+QTableView::item:selected {
+    background-color: #3498db; /* Blue */
+    color: white;
+}
+
+/* Text Edit */
+QTextEdit {
+    background-color: white;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    padding: 8px;
+}
+
+QTextEdit:focus {
+    border: 1px solid #3498db; /* Blue */
+}
+
+/* Status Bar */
+QStatusBar {
+    background-color: #ecf0f1;
+    border-top: 1px solid #bdc3c7;
+    padding: 5px;
+}
+
+/* Tool Bars */
+QToolBar {
+    background-color: #ecf0f1;
+    border-bottom: 1px solid #bdc3c7;
+    padding: 5px;
+}
+
+QToolBar::separator {
+    background-color: #bdc3c7;
+    width: 1px;
+    margin: 5px;
+}</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QPushButton" name="registration_button">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>440</y>
+      <width>191</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>-1</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="text">
+     <string>Зарегистрироваться</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="gridLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>120</y>
+      <width>431</width>
+      <height>266</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0">
+     <property name="leftMargin">
+      <number>5</number>
+     </property>
+     <property name="bottomMargin">
+      <number>10</number>
+     </property>
+     <property name="horizontalSpacing">
+      <number>10</number>
+     </property>
+     <property name="verticalSpacing">
+      <number>15</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>-1</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Логин</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>-1</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Пароль</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label">
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>-1</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Повторите пароль</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="loginEdit">
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="password1Edit">
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="password2Edit">
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QComboBox" name="comboBox">
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>-1</pointsize>
+        </font>
+       </property>
+       <item>
+        <property name="text">
+         <string>Ученик</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Учитель</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>-1</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Выберите роль</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>-1</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Имя пользователя</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="usernameEdit">
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>161</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="text">
+     <string>&lt;---   Вернуться</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
