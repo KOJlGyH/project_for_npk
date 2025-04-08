@@ -4,7 +4,7 @@ import requests
 import json
 import pandas as pd
 
-bot = telebot.TeleBot('7635382318:AAEJS3sTRkzhQ32c86asRf7L-nQYX4o-fv8')
+bot = telebot.TeleBot('token')
 
 
 def get_from_db(data):
