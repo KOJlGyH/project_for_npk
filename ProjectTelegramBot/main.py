@@ -2,7 +2,7 @@ import telebot
 from telebot import types
 import requests
 import json
-
+import pandas as pd
 
 bot = telebot.TeleBot('7635382318:AAEJS3sTRkzhQ32c86asRf7L-nQYX4o-fv8')
 
@@ -54,10 +54,8 @@ def results(message):
     key = message.text
     login = get_from_db(['login', 'tg', f'tg_id="{message.chat.id}"'])
     login = list(map(lambda x: x[0], login))[0]
-    print(login)
     result = get_from_db(['results', 'test', f'author="{login}" and key="{key}"'])
     result = list(map(lambda x: x[0], result))
-    print(result)
     if len(result) == 0:
         markup = types.InlineKeyboardMarkup()
         reg = types.InlineKeyboardButton('Отправить код ещё раз', callback_data='check_results')
@@ -66,8 +64,46 @@ def results(message):
         markup.add(back_to_menu)
         bot.send_message(message.chat.id, 'К сожалению я не нашёл такой работы', reply_markup=markup)
     else:
-        result = result[0]
-        result = '\n'.join(map(lambda x: '; '.join(x.split(',,')), result.split('***')))
+        result = result[0].rstrip('***').split('***')
+        print(result)
+        for i in range(len(result)):
+            result[i] = result[i].split(',,')
+            login = result[i][0]
+            username = get_from_db(['username', 'user', f'login="{login}"'])[0][0]
+            result[i][0] = username
+            result[i] = ';'.join(result[i])
+        print(result)
+
+
+
+        result = '\n'.join(result)
+        parsed_data = []
+        for entry in result:
+            name, tasks = entry.split(";")
+            correct, total = tasks.split(" of ")
+            correct = int(correct)
+            total = int(total)
+            percentage = (correct / total) * 100  # Процент выполнения
+            recommended_grade = "Отлично" if percentage >= 90 else "Хорошо" if percentage >= 70 else "Удовлетворительно" if percentage >= 50 else "Неудовлетворительно"  # Рекомендуемая оценка
+            parsed_data.append({
+                "Имя": name,
+                "Верные задачи": correct,
+                "Общее количество задач": total,
+                "Процент выполнения": percentage,
+                "Рекомендуемая оценка": recommended_grade
+            })
+
+        # Создаем DataFrame
+        df = pd.DataFrame(parsed_data)
+
+        # Сохраняем DataFrame в файл Excel
+        df.to_excel("результаты.xlsx", index=False, sheet_name="Результаты")
+
+        print("Файл 'результаты.xlsx' успешно создан!")
+
+
+
+
         markup = types.InlineKeyboardMarkup()
         back_to_menu = types.InlineKeyboardButton('Вернуться в меню', callback_data='back')
         markup.add(back_to_menu)

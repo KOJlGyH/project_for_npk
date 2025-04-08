@@ -1,8 +1,12 @@
 import sys
 import requests
 import json
+import random
+import string
 
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QFileDialog, QDialog, QVBoxLayout, QGraphicsView, QGraphicsScene, \
+    QGraphicsPixmapItem, QPushButton, QHBoxLayout
 from PyQt5.QtWidgets import QMainWindow
 
 from log_in import *
@@ -12,10 +16,14 @@ from start import *
 from student_menu import *
 from tester import *
 from res import *
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QKeyEvent
+
 
 
 # from bot import send_result
+def generate_code(length=8):
+    characters = string.ascii_letters + string.digits
+    return ''.join(random.choice(characters) for _ in range(length))
 
 
 def password_level(password):
@@ -26,12 +34,19 @@ def get_from_db(data):
     data = json.dumps(data)
     return requests.get('http://127.0.0.1:5000', data=data).json()
 
+def get_img(data):
+    data = json.dumps(data)
+    return requests.get('http://127.0.0.1:5000', data=data)
+
 
 def post_in_db(data):
     data = json.dumps(data)
     requests.post('http://127.0.0.1:5000/', data=data)
     return None
 
+def post_images(files):
+    requests.post('http://127.0.0.1:5000/', files=files)
+    return None
 
 class FirstMenu(QMainWindow, Ui_start):
     def __init__(self):
@@ -40,10 +55,10 @@ class FirstMenu(QMainWindow, Ui_start):
         self.setupUi(self)
         self.log_in.clicked.connect(self.log)
         self.registration.clicked.connect(self.reg)
-        self.pixmap = QPixmap('my.png').scaled(300, 300)
-        self.label.resize(300, 300)
-        self.label.move(100, 300)
-        self.label.setPixmap(self.pixmap)
+        # self.pixmap = QPixmap('my.png').scaled(300, 300)
+        # self.label.resize(300, 300)
+        # self.label.move(100, 300)
+        # self.label.setPixmap(self.pixmap)
 
     def log(self):
         self.next_form = LogIn()
@@ -92,6 +107,7 @@ class LogIn(QMainWindow, Ui_log_in):
             self.close()
 
 
+
 class Registration(QMainWindow, Ui_Registration):
     def __init__(self):
         super().__init__()
@@ -127,7 +143,8 @@ class Registration(QMainWindow, Ui_Registration):
         if self.comboBox.currentText() == 'Учитель':
             n = 1
         post_in_db(
-            ['insert', 'user(login, username, password, status)', f'{self.loginEdit.text()} {self.usernameEdit.text()} {self.password1Edit.text()} {n}'])
+            ['insert', 'user(login, username, password, status)',
+             f'{self.loginEdit.text()} {self.usernameEdit.text()} {self.password1Edit.text()} {n}'])
         self.new_form = LogIn()
         self.new_form.show()
         self.close()
@@ -171,9 +188,28 @@ class NewTest(QMainWindow, Ui_NewTest):
         self.loadButton.clicked.connect(self.load)
         self.pushButton.clicked.connect(self.back)
         self.pushButton_2.clicked.connect(self.result)
+        self.btn.clicked.connect(self.load_image)
+        self.image = []
+        self.counter = 0
+        self.aditive = 0
+        self.codeEdit.setText(generate_code())
+        self.pushButton_3.clicked.connect(self.copy_code)
+
+    def copy_code(self):
+        text = self.codeEdit.text()
+        clipboard = QApplication.clipboard()
+        clipboard.setText(text)
+        self.statusbar.showMessage('Код скопирован.')
+
+    def load_image(self):
+        options = QFileDialog.Options()
+        image_path, _ = QFileDialog.getOpenFileName(self, "Выберите изображение", "",
+                                                   "Images (*.png *.jpg *.bmp);;All Files (*)", options=options)
+        print(image_path)
+        self.image.append(['file', open(image_path, 'rb')])
+        self.aditive = 1
 
     def result(self):
-
         self.next_form = Results(self.login, self.codeEdit.text())
         self.next_form.show()
         self.close()
@@ -184,12 +220,17 @@ class NewTest(QMainWindow, Ui_NewTest):
         self.close()
 
     def add(self):
-        if self.answerEdit.text() == '' or self.qwestionEdit.text() == '':
+        if self.answerEdit.text() == '' or self.qwestionEdit.toPlainText() == '':
             self.statusbar.showMessage('Некорректные данные')
             self.qwestionEdit.setText('')
             self.answerEdit.setText('')
             return
-        s = self.qwestionEdit.text() + ',,,,' + self.answerEdit.text()
+        if self.aditive == 0:
+            s = self.qwestionEdit.toPlainText() + ',,,,' + self.answerEdit.text()
+        else:
+
+            s = self.qwestionEdit.toPlainText() + f'i{self.counter}' + ',,,,' + self.answerEdit.text()   #i - изображение
+            self.counter += self.aditive
         self.answers.append(s)
         self.qwestionEdit.setText('')
         self.answerEdit.setText('')
@@ -212,7 +253,14 @@ class NewTest(QMainWindow, Ui_NewTest):
             self.statusbar.showMessage('Ваш ключ не уникален')
             return
         self.answers = '***'.join(self.answers)
+        for i in range(len(self.image)):
+            if i == 0:
+                self.image[i][0] = self.codeEdit.text()
+            else:
+                self.image[i][0] = f'file{i}'
+            self.image[i] = tuple(self.image[i])
         post_in_db(['insert', 'test(key, t, author)', f'{self.codeEdit.text()} {self.answers} {self.login}'])
+        post_images(files=self.image)
         self.statusbar.showMessage('Проверочная создана успешно')
 
 
@@ -234,12 +282,15 @@ class Results(QMainWindow, Ui_Res):
         res = res.split(',,')
         res[1] = res[1].split('***')
         res[1] = '\n'.join(res[1])
-        res = ';'.join(res)
-        f = open(f't{self.code}.txt', mode='w')
-        f1 = open(f't{self.code}.txt', mode='r')
-        f.write(res)
-        f.close()
-        res = f1.read()
+        res = ';'.join(res).rstrip('***')
+        res = res.split('\n')
+        for i in range(len(res)):
+            res[i] = res[i].split(';')
+            login = res[i][0]
+            username = get_from_db(['username', 'user', f'login="{login}"'])[0][0]
+            res[i][0] = username
+            res[i] = ';'.join(res[i])
+        res = '\n'.join(res)
         self.textBrowser.setText(res)
 
     def back(self):
@@ -254,6 +305,7 @@ class Tester(QMainWindow, Ui_Tester):
         self.setupUi(self)
         self.login = login
         self.key = key
+        print(self.key)
         self.results = []
         # Внутри test пары вопрос ответ через *** а внутри через ,,,,
         self.test = test.split('***')
@@ -264,9 +316,85 @@ class Tester(QMainWindow, Ui_Tester):
         self.nextButton.clicked.connect(self.next)
         self.endButton.clicked.connect(self.end)
         self.current_qwe = 0
-        self.qwestionText.setText(self.test[self.current_qwe][0])
+        self.index = -1
+        if 'i' in self.test[self.current_qwe][0]:
+            self.index = self.test[self.current_qwe][0][self.test[self.current_qwe][0].index('i') + 1:]
+        self.qwestionText.setText(self.test[self.current_qwe][0][:self.test[self.current_qwe][0].index('i')])
         self.max_qwe = len(self.test) - 1
         self.pushButton.clicked.connect(self.back)
+        if self.index != -1:
+            s = '\\'
+            filename = f'images{s}{self.key}{self.index}'
+            response = get_img({'filename': filename})
+            file = open("temp_image.jpg", "wb")
+            file.write(response.content)
+            pixmap = QPixmap("temp_image.jpg")
+            self.label_3.setPixmap(pixmap.scaled(self.label_3.size(), Qt.AspectRatioMode.KeepAspectRatio))
+            self.label_3.mousePressEvent = lambda event: self.view_image("temp_image.jpg")
+
+    def view_image(self, image_path):
+        image_dialog = QDialog(self)
+        image_dialog.setWindowTitle("View Image")
+        image_dialog.setGeometry(100, 100, 600, 400)
+
+        main_layout = QVBoxLayout()
+        image_view = QGraphicsView()
+        image_scene = QGraphicsScene()
+        pixmap = QPixmap(image_path)
+        image_item = QGraphicsPixmapItem(pixmap)
+        image_scene.addItem(image_item)
+        image_view.setScene(image_scene)
+        main_layout.addWidget(image_view)
+
+        # Устанавливаем фокус на QGraphicsView для получения событий клавиатуры
+        image_view.setFocusPolicy(Qt.StrongFocus)
+        image_view.setFocus()
+
+        rotate_button = QPushButton("Rotate")
+        rotate_button.setFixedSize(100, 40)
+
+        button_layout = QHBoxLayout()
+        button_layout.addStretch()
+        button_layout.addWidget(rotate_button)
+        main_layout.addLayout(button_layout)
+
+        image_dialog.setLayout(main_layout)
+
+        def rotate_image(angle):
+            image_item.setRotation(image_item.rotation() + angle)
+
+        rotate_button.clicked.connect(lambda: rotate_image(90))
+
+        def keyPressEvent(event: QKeyEvent):
+            if event.modifiers() & Qt.ControlModifier:
+                if event.key() == Qt.Key_Left:
+                    rotate_image(-90)
+                    event.accept()  # Помечаем событие как обработанное
+                    return
+                elif event.key() == Qt.Key_Right:
+                    rotate_image(90)
+                    event.accept()
+                    return
+            # Для остальных случаев вызываем базовую обработку
+            QGraphicsView.keyPressEvent(image_view, event)
+
+        # Переопределяем keyPressEvent для QGraphicsView
+        image_view.keyPressEvent = keyPressEvent
+
+        def wheelEvent(event):
+            if event.modifiers() == Qt.ControlModifier:
+                delta = event.angleDelta().y()
+                if delta > 0:
+                    image_view.scale(1.2, 1.2)
+                else:
+                    image_view.scale(0.8, 0.8)
+                event.accept()  # Помечаем событие как обработанное
+            else:
+                QGraphicsView.wheelEvent(image_view, event)
+
+        image_view.wheelEvent = wheelEvent
+
+        image_dialog.exec()
 
     def back(self):
         self.next_form = StudentMenu(self.login)
@@ -274,21 +402,44 @@ class Tester(QMainWindow, Ui_Tester):
         self.close()
 
     def save(self):
+        self.statusbar.showMessage('')
         self.user_answers[self.current_qwe] = self.answerEdit.text()
 
     def preview(self):
         if self.current_qwe == 0:
             self.statusbar.showMessage('Некорректный запрос')
             return
+        self.statusbar.showMessage('')
         self.current_qwe = self.current_qwe - 1
-        self.qwestionText.setText(self.test[self.current_qwe][0])
+        if 'i' in self.test[self.current_qwe][0]:
+            self.index = self.test[self.current_qwe][0][self.test[self.current_qwe][0].index('i') + 1:]
+        self.qwestionText.setText(self.test[self.current_qwe][0][:self.test[self.current_qwe][0].index('i')])
+        if self.index != -1:
+            s = '\\'
+            filename = f'images{s}{self.key}{self.index}'
+            response = get_img({'filename': filename})
+            file = open("temp_image.jpg", "wb")
+            file.write(response.content)
+            pixmap = QPixmap("temp_image.jpg")
+            self.label_3.setPixmap(pixmap.scaled(self.label_3.size(), Qt.AspectRatioMode.KeepAspectRatio))
 
     def next(self):
         if self.current_qwe + 1 > self.max_qwe:
             self.statusbar.showMessage('Некорректный запрос')
             return
+        self.statusbar.showMessage('')
         self.current_qwe = self.current_qwe + 1
-        self.qwestionText.setText(self.test[self.current_qwe][0])
+        if 'i' in self.test[self.current_qwe][0]:
+            self.index = self.test[self.current_qwe][0][self.test[self.current_qwe][0].index('i') + 1:]
+        self.qwestionText.setText(self.test[self.current_qwe][0][:self.test[self.current_qwe][0].index('i')])
+        if self.index != -1:
+            s = '\\'
+            filename = f'images{s}{self.key}{self.index}'
+            response = get_img({'filename': filename})
+            file = open("temp_image.jpg", "wb")
+            file.write(response.content)
+            pixmap = QPixmap("temp_image.jpg")
+            self.label_3.setPixmap(pixmap.scaled(self.label_3.size(), Qt.AspectRatioMode.KeepAspectRatio))
         self.answerEdit.setText('')
 
     def end(self):
@@ -316,7 +467,7 @@ class Tester(QMainWindow, Ui_Tester):
         else:
             pre += self.login + '***'
         post_in_db(['update', 'test', f'logins="{pre}"', f'key="{self.key}"'])
-        self.statusbar.showMessage('Ваш ответ записан')
+        self.statusbar.showMessage('Работа завершена')
 
 
 def except_hook(cls, exception, traceback):

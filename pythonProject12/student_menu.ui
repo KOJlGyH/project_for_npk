@@ -14,24 +14,370 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(255, 247, 201);</string>
+   <string notr="true">/* General Settings */
+QWidget {
+    font-family: &quot;Comic Sans MS&quot;; /* Fun and playful font */
+    font-size: 14px;
+    color: #2c3e50; /* Dark blue for text */
+    background-color: #f9f9f9; /* Light gray background */
+}
+
+/* Background Images for Different Pages */
+QWidget#mathPage {
+    background-image: url(:/backgrounds/math_background.png); /* Math-themed background */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+QWidget#sciencePage {
+    background-image: url(:/backgrounds/science_background.png); /* Science-themed background */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+QWidget#literaturePage {
+    background-image: url(:/backgrounds/literature_background.png); /* Literature-themed background */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+QWidget#historyPage {
+    background-image: url(:/backgrounds/history_background.png); /* History-themed background */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+/* Buttons */
+QPushButton {
+    background-color: #ff6f61; /* Coral */
+    color: white;
+    border: 2px solid #ff3b2f; /* Darker coral */
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+QPushButton:hover {
+    background-color: #ff3b2f; /* Darker coral on hover */
+}
+
+QPushButton:pressed {
+    background-color: #ff1a1a; /* Even darker coral when pressed */
+}
+
+QPushButton:disabled {
+    background-color: #bdc3c7; /* Gray */
+    color: #7f8c8d; /* Light gray text */
+    border: 2px solid #95a5a6;
+}
+
+/* Line Edits */
+QLineEdit {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+    border: 2px solid #3498db; /* Blue border */
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 14px;
+}
+
+QLineEdit:focus {
+    border: 2px solid #ff6f61; /* Coral border when focused */
+}
+
+/* Labels */
+QLabel {
+    color: #2c3e50; /* Dark blue */
+    font-size: 14px;
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+    border-radius: 10px;
+    padding: 10px;
+}
+
+QLabel#titleLabel {
+    font-size: 24px;
+    font-weight: bold;
+    color: #3498db; /* Blue for titles */
+    background-color: transparent; /* No background for titles */
+}
+
+/* Combo Boxes */
+QComboBox {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+    border: 2px solid #3498db; /* Blue border */
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 14px;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 30px;
+    border-left: 2px solid #3498db;
+}
+
+QComboBox::down-arrow {
+    image: url(:/icons/down_arrow.png); /* Replace with your icon */
+}
+
+QComboBox QAbstractItemView {
+    background-color: white;
+    border: 2px solid #3498db;
+    selection-background-color: #ff6f61; /* Coral for selected item */
+    selection-color: white;
+}
+
+/* Check Boxes */
+QCheckBox {
+    color: #2c3e50;
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+    border-radius: 10px;
+    padding: 10px;
+}
+
+QCheckBox::indicator {
+    width: 20px;
+    height: 20px;
+}
+
+QCheckBox::indicator:checked {
+    image: url(:/icons/checked.png); /* Replace with your icon */
+}
+
+QCheckBox::indicator:unchecked {
+    image: url(:/icons/unchecked.png); /* Replace with your icon */
+}
+
+/* Radio Buttons */
+QRadioButton {
+    color: #2c3e50;
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+    border-radius: 10px;
+    padding: 10px;
+}
+
+QRadioButton::indicator {
+    width: 20px;
+    height: 20px;
+}
+
+QRadioButton::indicator:checked {
+    image: url(:/icons/radio_checked.png); /* Replace with your icon */
+}
+
+QRadioButton::indicator:unchecked {
+    image: url(:/icons/radio_unchecked.png); /* Replace with your icon */
+}
+
+/* Progress Bars */
+QProgressBar {
+    background-color: #bdc3c7;
+    border: 2px solid #95a5a6;
+    border-radius: 10px;
+    text-align: center;
+    color: #2c3e50;
+}
+
+QProgressBar::chunk {
+    background-color: #ff6f61; /* Coral */
+    border-radius: 10px;
+}
+
+/* Spin Boxes */
+QSpinBox {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+    border: 2px solid #3498db; /* Blue border */
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 14px;
+}
+
+QSpinBox::up-button, QSpinBox::down-button {
+    subcontrol-origin: border;
+    subcontrol-position: top right;
+    width: 30px;
+    border-left: 2px solid #3498db;
+}
+
+QSpinBox::up-arrow {
+    image: url(:/icons/up_arrow.png); /* Replace with your icon */
+}
+
+QSpinBox::down-arrow {
+    image: url(:/icons/down_arrow.png); /* Replace with your icon */
+}
+
+/* Group Boxes */
+QGroupBox {
+    border: 2px solid #3498db; /* Blue border */
+    border-radius: 10px;
+    margin-top: 10px;
+    padding-top: 15px;
+    font-weight: bold;
+    color: #3498db; /* Blue for group box titles */
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 0 10px;
+}
+
+/* Tabs */
+QTabWidget::pane {
+    border: 2px solid #3498db; /* Blue border */
+    border-radius: 10px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+}
+
+QTabBar::tab {
+    background-color: #ecf0f1;
+    border: 2px solid #3498db;
+    border-bottom: none;
+    padding: 10px 20px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    font-size: 14px;
+}
+
+QTabBar::tab:selected {
+    background-color: white;
+    border-bottom: 2px solid white;
+}
+
+QTabBar::tab:hover {
+    background-color: #ff6f61; /* Coral on hover */
+    color: white;
+}
+
+/* Scroll Bars */
+QScrollBar:horizontal, QScrollBar:vertical {
+    background-color: #ecf0f1;
+    border-radius: 10px;
+}
+
+QScrollBar::handle:horizontal, QScrollBar::handle:vertical {
+    background-color: #ff6f61; /* Coral */
+    border-radius: 10px;
+}
+
+QScrollBar::add-line, QScrollBar::sub-line {
+    background: none;
+}
+
+/* Tool Tips */
+QToolTip {
+    background-color: #ff6f61; /* Coral */
+    color: white;
+    border: 2px solid #ff3b2f;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* Menus */
+QMenuBar {
+    background-color: #ecf0f1;
+    color: #2c3e50;
+}
+
+QMenuBar::item {
+    padding: 10px 20px;
+}
+
+QMenuBar::item:selected {
+    background-color: #ff6f61; /* Coral */
+    color: white;
+}
+
+QMenu {
+    background-color: white;
+    border: 2px solid #3498db;
+    padding: 10px;
+}
+
+QMenu::item {
+    padding: 10px 20px;
+}
+
+QMenu::item:selected {
+    background-color: #ff6f61; /* Coral */
+    color: white;
+}
+
+/* Tables */
+QTableView {
+    background-color: white;
+    border: 2px solid #3498db;
+    border-radius: 10px;
+}
+
+QTableView::item {
+    padding: 10px;
+}
+
+QTableView::item:selected {
+    background-color: #ff6f61; /* Coral */
+    color: white;
+}
+
+/* Text Edit */
+QTextEdit {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+    border: 2px solid #3498db;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+QTextEdit:focus {
+    border: 2px solid #ff6f61; /* Coral */
+}
+
+/* Status Bar */
+QStatusBar {
+    background-color: #ecf0f1;
+    border-top: 2px solid #3498db;
+    padding: 10px;
+}
+
+/* Tool Bars */
+QToolBar {
+    background-color: #ecf0f1;
+    border-bottom: 2px solid #3498db;
+    padding: 10px;
+}
+
+QToolBar::separator {
+    background-color: #3498db;
+    width: 2px;
+    margin: 10px;
+}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>50</y>
-      <width>301</width>
-      <height>31</height>
+      <x>300</x>
+      <y>20</y>
+      <width>231</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <pointsize>20</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
+      <family>Comic Sans MS</family>
+      <pointsize>-1</pointsize>
      </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font-size: 20px;
+</string>
     </property>
     <property name="text">
      <string>Проверочная работа</string>
@@ -40,16 +386,14 @@
    <widget class="QPushButton" name="startTestButton">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>290</x>
       <y>340</y>
-      <width>161</width>
+      <width>211</width>
       <height>41</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(255, 253, 174);
-font: 75 11pt &quot;MS Shell Dlg 2&quot;;
-text-decoration: underline;</string>
+     <string notr="true"/>
     </property>
     <property name="text">
      <string>Начать проверочную</string>
@@ -58,18 +402,22 @@ text-decoration: underline;</string>
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>130</y>
+      <x>190</x>
+      <y>180</y>
       <width>421</width>
-      <height>141</height>
+      <height>71</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
      <item>
       <widget class="QLabel" name="label_3">
        <property name="font">
         <font>
-         <pointsize>16</pointsize>
+         <family>Comic Sans MS</family>
+         <pointsize>-1</pointsize>
         </font>
        </property>
        <property name="text">
@@ -79,8 +427,14 @@ text-decoration: underline;</string>
      </item>
      <item>
       <widget class="QLineEdit" name="codeEdit">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>45</height>
+        </size>
+       </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(255, 255, 255);</string>
+        <string notr="true"/>
        </property>
       </widget>
      </item>
@@ -89,16 +443,14 @@ text-decoration: underline;</string>
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>20</y>
-      <width>151</width>
-      <height>31</height>
+      <x>10</x>
+      <y>30</y>
+      <width>171</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(255, 253, 174);
-font: 75 11pt &quot;MS Shell Dlg 2&quot;;
-text-decoration: underline;</string>
+     <string notr="true"/>
     </property>
     <property name="text">
      <string>&lt;--- Вернуться</string>

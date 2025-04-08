@@ -15,75 +15,115 @@ class Ui_Registration(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
+        font = QtGui.QFont()
+        font.setFamily("Comic Sans MS")
+        font.setPointSize(-1)
+        MainWindow.setFont(font)
         MainWindow.setStyleSheet("/* General Settings */\n"
 "QWidget {\n"
-"    font-family: \"Segoe UI\";\n"
+"    font-family: \"Comic Sans MS\"; /* Fun and playful font */\n"
 "    font-size: 14px;\n"
 "    color: #2c3e50; /* Dark blue for text */\n"
-"    background-color: #ecf0f1; /* Light gray background */\n"
+"    background-color: #f9f9f9; /* Light gray background */\n"
+"}\n"
+"\n"
+"/* Background Images for Different Pages */\n"
+"QWidget#mathPage {\n"
+"    background-image: url(:/backgrounds/math_background.png); /* Math-themed background */\n"
+"    background-position: center;\n"
+"    background-repeat: no-repeat;\n"
+"    background-size: cover;\n"
+"}\n"
+"\n"
+"QWidget#sciencePage {\n"
+"    background-image: url(:/backgrounds/science_background.png); /* Science-themed background */\n"
+"    background-position: center;\n"
+"    background-repeat: no-repeat;\n"
+"    background-size: cover;\n"
+"}\n"
+"\n"
+"QWidget#literaturePage {\n"
+"    background-image: url(:/backgrounds/literature_background.png); /* Literature-themed background */\n"
+"    background-position: center;\n"
+"    background-repeat: no-repeat;\n"
+"    background-size: cover;\n"
+"}\n"
+"\n"
+"QWidget#historyPage {\n"
+"    background-image: url(:/backgrounds/history_background.png); /* History-themed background */\n"
+"    background-position: center;\n"
+"    background-repeat: no-repeat;\n"
+"    background-size: cover;\n"
 "}\n"
 "\n"
 "/* Buttons */\n"
 "QPushButton {\n"
-"    background-color: #3498db; /* Blue */\n"
+"    background-color: #ff6f61; /* Coral */\n"
 "    color: white;\n"
-"    border: 1px solid #2980b9; /* Darker blue */\n"
-"    border-radius: 5px;\n"
-"    padding: 8px 16px;\n"
+"    border: 2px solid #ff3b2f; /* Darker coral */\n"
+"    border-radius: 10px;\n"
+"    padding: 10px 20px;\n"
 "    font-weight: bold;\n"
+"    font-size: 16px;\n"
 "}\n"
 "\n"
 "QPushButton:hover {\n"
-"    background-color: #2980b9; /* Darker blue on hover */\n"
+"    background-color: #ff3b2f; /* Darker coral on hover */\n"
 "}\n"
 "\n"
 "QPushButton:pressed {\n"
-"    background-color: #1c5980; /* Even darker blue when pressed */\n"
+"    background-color: #ff1a1a; /* Even darker coral when pressed */\n"
 "}\n"
 "\n"
 "QPushButton:disabled {\n"
 "    background-color: #bdc3c7; /* Gray */\n"
 "    color: #7f8c8d; /* Light gray text */\n"
-"    border: 1px solid #95a5a6;\n"
+"    border: 2px solid #95a5a6;\n"
 "}\n"
 "\n"
 "/* Line Edits */\n"
 "QLineEdit {\n"
-"    background-color: white;\n"
-"    border: 1px solid #bdc3c7; /* Light gray border */\n"
-"    border-radius: 5px;\n"
-"    padding: 8px;\n"
+"    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */\n"
+"    border: 2px solid #3498db; /* Blue border */\n"
+"    border-radius: 10px;\n"
+"    padding: 10px;\n"
+"font-size: 20px;\n"
 "}\n"
 "\n"
 "QLineEdit:focus {\n"
-"    border: 1px solid #3498db; /* Blue border when focused */\n"
+"    border: 2px solid #ff6f61; /* Coral border when focused */\n"
 "}\n"
 "\n"
 "/* Labels */\n"
 "QLabel {\n"
 "    color: #2c3e50; /* Dark blue */\n"
 "    font-size: 14px;\n"
+"    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */\n"
+"    border-radius: 10px;\n"
+"    padding: 10px;\n"
 "}\n"
 "\n"
 "QLabel#titleLabel {\n"
-"    font-size: 18px;\n"
+"    font-size: 24px;\n"
 "    font-weight: bold;\n"
 "    color: #3498db; /* Blue for titles */\n"
+"    background-color: transparent; /* No background for titles */\n"
 "}\n"
 "\n"
 "/* Combo Boxes */\n"
 "QComboBox {\n"
-"    background-color: white;\n"
-"    border: 1px solid #bdc3c7;\n"
-"    border-radius: 5px;\n"
-"    padding: 8px;\n"
+"    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */\n"
+"    border: 2px solid #3498db; /* Blue border */\n"
+"    border-radius: 10px;\n"
+"    padding: 10px;\n"
+"    font-size: 14px;\n"
 "}\n"
 "\n"
 "QComboBox::drop-down {\n"
 "    subcontrol-origin: padding;\n"
 "    subcontrol-position: top right;\n"
-"    width: 25px;\n"
-"    border-left: 1px solid #bdc3c7;\n"
+"    width: 30px;\n"
+"    border-left: 2px solid #3498db;\n"
 "}\n"
 "\n"
 "QComboBox::down-arrow {\n"
@@ -92,19 +132,22 @@ class Ui_Registration(object):
 "\n"
 "QComboBox QAbstractItemView {\n"
 "    background-color: white;\n"
-"    border: 1px solid #bdc3c7;\n"
-"    selection-background-color: #3498db; /* Blue for selected item */\n"
+"    border: 2px solid #3498db;\n"
+"    selection-background-color: #ff6f61; /* Coral for selected item */\n"
 "    selection-color: white;\n"
 "}\n"
 "\n"
 "/* Check Boxes */\n"
 "QCheckBox {\n"
 "    color: #2c3e50;\n"
+"    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */\n"
+"    border-radius: 10px;\n"
+"    padding: 10px;\n"
 "}\n"
 "\n"
 "QCheckBox::indicator {\n"
-"    width: 16px;\n"
-"    height: 16px;\n"
+"    width: 20px;\n"
+"    height: 20px;\n"
 "}\n"
 "\n"
 "QCheckBox::indicator:checked {\n"
@@ -118,11 +161,14 @@ class Ui_Registration(object):
 "/* Radio Buttons */\n"
 "QRadioButton {\n"
 "    color: #2c3e50;\n"
+"    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */\n"
+"    border-radius: 10px;\n"
+"    padding: 10px;\n"
 "}\n"
 "\n"
 "QRadioButton::indicator {\n"
-"    width: 16px;\n"
-"    height: 16px;\n"
+"    width: 20px;\n"
+"    height: 20px;\n"
 "}\n"
 "\n"
 "QRadioButton::indicator:checked {\n"
@@ -136,30 +182,31 @@ class Ui_Registration(object):
 "/* Progress Bars */\n"
 "QProgressBar {\n"
 "    background-color: #bdc3c7;\n"
-"    border: 1px solid #95a5a6;\n"
-"    border-radius: 5px;\n"
+"    border: 2px solid #95a5a6;\n"
+"    border-radius: 10px;\n"
 "    text-align: center;\n"
 "    color: #2c3e50;\n"
 "}\n"
 "\n"
 "QProgressBar::chunk {\n"
-"    background-color: #3498db; /* Blue */\n"
-"    border-radius: 5px;\n"
+"    background-color: #ff6f61; /* Coral */\n"
+"    border-radius: 10px;\n"
 "}\n"
 "\n"
 "/* Spin Boxes */\n"
 "QSpinBox {\n"
-"    background-color: white;\n"
-"    border: 1px solid #bdc3c7;\n"
-"    border-radius: 5px;\n"
-"    padding: 8px;\n"
+"    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */\n"
+"    border: 2px solid #3498db; /* Blue border */\n"
+"    border-radius: 10px;\n"
+"    padding: 10px;\n"
+"    font-size: 14px;\n"
 "}\n"
 "\n"
 "QSpinBox::up-button, QSpinBox::down-button {\n"
 "    subcontrol-origin: border;\n"
 "    subcontrol-position: top right;\n"
-"    width: 20px;\n"
-"    border-left: 1px solid #bdc3c7;\n"
+"    width: 30px;\n"
+"    border-left: 2px solid #3498db;\n"
 "}\n"
 "\n"
 "QSpinBox::up-arrow {\n"
@@ -172,55 +219,58 @@ class Ui_Registration(object):
 "\n"
 "/* Group Boxes */\n"
 "QGroupBox {\n"
-"    border: 1px solid #bdc3c7;\n"
-"    border-radius: 5px;\n"
+"    border: 2px solid #3498db; /* Blue border */\n"
+"    border-radius: 10px;\n"
 "    margin-top: 10px;\n"
 "    padding-top: 15px;\n"
 "    font-weight: bold;\n"
 "    color: #3498db; /* Blue for group box titles */\n"
+"    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */\n"
 "}\n"
 "\n"
 "QGroupBox::title {\n"
 "    subcontrol-origin: margin;\n"
 "    subcontrol-position: top left;\n"
-"    padding: 0 5px;\n"
+"    padding: 0 10px;\n"
 "}\n"
 "\n"
 "/* Tabs */\n"
 "QTabWidget::pane {\n"
-"    border: 1px solid #bdc3c7;\n"
-"    border-radius: 5px;\n"
-"    padding: 5px;\n"
+"    border: 2px solid #3498db; /* Blue border */\n"
+"    border-radius: 10px;\n"
+"    padding: 10px;\n"
+"    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */\n"
 "}\n"
 "\n"
 "QTabBar::tab {\n"
 "    background-color: #ecf0f1;\n"
-"    border: 1px solid #bdc3c7;\n"
+"    border: 2px solid #3498db;\n"
 "    border-bottom: none;\n"
-"    padding: 8px 16px;\n"
-"    border-top-left-radius: 5px;\n"
-"    border-top-right-radius: 5px;\n"
+"    padding: 10px 20px;\n"
+"    border-top-left-radius: 10px;\n"
+"    border-top-right-radius: 10px;\n"
+"    font-size: 14px;\n"
 "}\n"
 "\n"
 "QTabBar::tab:selected {\n"
 "    background-color: white;\n"
-"    border-bottom: 1px solid white;\n"
+"    border-bottom: 2px solid white;\n"
 "}\n"
 "\n"
 "QTabBar::tab:hover {\n"
-"    background-color: #3498db; /* Blue on hover */\n"
+"    background-color: #ff6f61; /* Coral on hover */\n"
 "    color: white;\n"
 "}\n"
 "\n"
 "/* Scroll Bars */\n"
 "QScrollBar:horizontal, QScrollBar:vertical {\n"
 "    background-color: #ecf0f1;\n"
-"    border-radius: 5px;\n"
+"    border-radius: 10px;\n"
 "}\n"
 "\n"
 "QScrollBar::handle:horizontal, QScrollBar::handle:vertical {\n"
-"    background-color: #3498db; /* Blue */\n"
-"    border-radius: 5px;\n"
+"    background-color: #ff6f61; /* Coral */\n"
+"    border-radius: 10px;\n"
 "}\n"
 "\n"
 "QScrollBar::add-line, QScrollBar::sub-line {\n"
@@ -229,11 +279,11 @@ class Ui_Registration(object):
 "\n"
 "/* Tool Tips */\n"
 "QToolTip {\n"
-"    background-color: #3498db; /* Blue */\n"
+"    background-color: #ff6f61; /* Coral */\n"
 "    color: white;\n"
-"    border: 1px solid #2980b9;\n"
-"    padding: 5px;\n"
-"    border-radius: 5px;\n"
+"    border: 2px solid #ff3b2f;\n"
+"    padding: 10px;\n"
+"    border-radius: 10px;\n"
 "}\n"
 "\n"
 "/* Menus */\n"
@@ -243,82 +293,82 @@ class Ui_Registration(object):
 "}\n"
 "\n"
 "QMenuBar::item {\n"
-"    padding: 8px 16px;\n"
+"    padding: 10px 20px;\n"
 "}\n"
 "\n"
 "QMenuBar::item:selected {\n"
-"    background-color: #3498db; /* Blue */\n"
+"    background-color: #ff6f61; /* Coral */\n"
 "    color: white;\n"
 "}\n"
 "\n"
 "QMenu {\n"
 "    background-color: white;\n"
-"    border: 1px solid #bdc3c7;\n"
-"    padding: 5px;\n"
+"    border: 2px solid #3498db;\n"
+"    padding: 10px;\n"
 "}\n"
 "\n"
 "QMenu::item {\n"
-"    padding: 8px 16px;\n"
+"    padding: 10px 20px;\n"
 "}\n"
 "\n"
 "QMenu::item:selected {\n"
-"    background-color: #3498db; /* Blue */\n"
+"    background-color: #ff6f61; /* Coral */\n"
 "    color: white;\n"
 "}\n"
 "\n"
 "/* Tables */\n"
 "QTableView {\n"
 "    background-color: white;\n"
-"    border: 1px solid #bdc3c7;\n"
-"    border-radius: 5px;\n"
+"    border: 2px solid #3498db;\n"
+"    border-radius: 10px;\n"
 "}\n"
 "\n"
 "QTableView::item {\n"
-"    padding: 8px;\n"
+"    padding: 10px;\n"
 "}\n"
 "\n"
 "QTableView::item:selected {\n"
-"    background-color: #3498db; /* Blue */\n"
+"    background-color: #ff6f61; /* Coral */\n"
 "    color: white;\n"
 "}\n"
 "\n"
 "/* Text Edit */\n"
 "QTextEdit {\n"
-"    background-color: white;\n"
-"    border: 1px solid #bdc3c7;\n"
-"    border-radius: 5px;\n"
-"    padding: 8px;\n"
+"    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */\n"
+"    border: 2px solid #3498db;\n"
+"    border-radius: 10px;\n"
+"    padding: 10px;\n"
 "}\n"
 "\n"
 "QTextEdit:focus {\n"
-"    border: 1px solid #3498db; /* Blue */\n"
+"    border: 2px solid #ff6f61; /* Coral */\n"
 "}\n"
 "\n"
 "/* Status Bar */\n"
 "QStatusBar {\n"
 "    background-color: #ecf0f1;\n"
-"    border-top: 1px solid #bdc3c7;\n"
-"    padding: 5px;\n"
+"    border-top: 2px solid #3498db;\n"
+"    padding: 10px;\n"
 "}\n"
 "\n"
 "/* Tool Bars */\n"
 "QToolBar {\n"
 "    background-color: #ecf0f1;\n"
-"    border-bottom: 1px solid #bdc3c7;\n"
-"    padding: 5px;\n"
+"    border-bottom: 2px solid #3498db;\n"
+"    padding: 10px;\n"
 "}\n"
 "\n"
 "QToolBar::separator {\n"
-"    background-color: #bdc3c7;\n"
-"    width: 1px;\n"
-"    margin: 5px;\n"
+"    background-color: #3498db;\n"
+"    width: 2px;\n"
+"    margin: 10px;\n"
 "}")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.registration_button = QtWidgets.QPushButton(self.centralwidget)
-        self.registration_button.setGeometry(QtCore.QRect(280, 440, 191, 41))
+        self.registration_button.setGeometry(QtCore.QRect(280, 480, 221, 61))
         font = QtGui.QFont()
-        font.setFamily("Segoe UI")
+        font.setFamily("Comic Sans MS")
         font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
@@ -326,16 +376,8 @@ class Ui_Registration(object):
         self.registration_button.setAutoFillBackground(False)
         self.registration_button.setStyleSheet("")
         self.registration_button.setObjectName("registration_button")
-        self.label_4 = QtWidgets.QLabel(self.centralwidget)
-        self.label_4.setEnabled(False)
-        self.label_4.setGeometry(QtCore.QRect(340, 30, 91, 61))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(-1)
-        self.label_4.setFont(font)
-        self.label_4.setObjectName("label_4")
         self.gridLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(180, 120, 431, 266))
+        self.gridLayoutWidget.setGeometry(QtCore.QRect(180, 100, 431, 361))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
         self.gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget)
         self.gridLayout.setContentsMargins(5, 0, 0, 10)
@@ -344,21 +386,21 @@ class Ui_Registration(object):
         self.gridLayout.setObjectName("gridLayout")
         self.label_3 = QtWidgets.QLabel(self.gridLayoutWidget)
         font = QtGui.QFont()
-        font.setFamily("Segoe UI")
+        font.setFamily("Comic Sans MS")
         font.setPointSize(-1)
         self.label_3.setFont(font)
         self.label_3.setObjectName("label_3")
         self.gridLayout.addWidget(self.label_3, 0, 0, 1, 1)
         self.label_2 = QtWidgets.QLabel(self.gridLayoutWidget)
         font = QtGui.QFont()
-        font.setFamily("Segoe UI")
+        font.setFamily("Comic Sans MS")
         font.setPointSize(-1)
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
         self.gridLayout.addWidget(self.label_2, 2, 0, 1, 1)
         self.label = QtWidgets.QLabel(self.gridLayoutWidget)
         font = QtGui.QFont()
-        font.setFamily("Segoe UI")
+        font.setFamily("Comic Sans MS")
         font.setPointSize(-1)
         self.label.setFont(font)
         self.label.setObjectName("label")
@@ -377,7 +419,7 @@ class Ui_Registration(object):
         self.gridLayout.addWidget(self.password2Edit, 3, 1, 1, 1)
         self.comboBox = QtWidgets.QComboBox(self.gridLayoutWidget)
         font = QtGui.QFont()
-        font.setFamily("Segoe UI")
+        font.setFamily("Comic Sans MS")
         font.setPointSize(-1)
         self.comboBox.setFont(font)
         self.comboBox.setObjectName("comboBox")
@@ -386,14 +428,14 @@ class Ui_Registration(object):
         self.gridLayout.addWidget(self.comboBox, 4, 1, 1, 1)
         self.label_5 = QtWidgets.QLabel(self.gridLayoutWidget)
         font = QtGui.QFont()
-        font.setFamily("Segoe UI")
+        font.setFamily("Comic Sans MS")
         font.setPointSize(-1)
         self.label_5.setFont(font)
         self.label_5.setObjectName("label_5")
         self.gridLayout.addWidget(self.label_5, 4, 0, 1, 1)
         self.label_6 = QtWidgets.QLabel(self.gridLayoutWidget)
         font = QtGui.QFont()
-        font.setFamily("Segoe UI")
+        font.setFamily("Comic Sans MS")
         font.setPointSize(-1)
         self.label_6.setFont(font)
         self.label_6.setObjectName("label_6")
@@ -403,7 +445,7 @@ class Ui_Registration(object):
         self.usernameEdit.setObjectName("usernameEdit")
         self.gridLayout.addWidget(self.usernameEdit, 1, 1, 1, 1)
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(20, 20, 161, 31))
+        self.pushButton.setGeometry(QtCore.QRect(20, 20, 191, 51))
         self.pushButton.setStyleSheet("")
         self.pushButton.setObjectName("pushButton")
         MainWindow.setCentralWidget(self.centralwidget)
@@ -418,7 +460,6 @@ class Ui_Registration(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.registration_button.setText(_translate("MainWindow", "Зарегистрироваться"))
-        self.label_4.setText(_translate("MainWindow", "Регистрация"))
         self.label_3.setText(_translate("MainWindow", "Логин"))
         self.label_2.setText(_translate("MainWindow", "Пароль"))
         self.label.setText(_translate("MainWindow", "Повторите пароль"))
