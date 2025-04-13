@@ -1,14 +1,20 @@
 import sys
+from idlelib.replace import replace
+
 import requests
 import json
 import random
 import string
+import re
+import hashlib
+import os
+import sys
+import traceback
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QFileDialog, QDialog, QVBoxLayout, QGraphicsView, QGraphicsScene, \
     QGraphicsPixmapItem, QPushButton, QHBoxLayout
 from PyQt5.QtWidgets import QMainWindow
-
 from log_in import *
 from new_test import *
 from registration import *
@@ -18,6 +24,51 @@ from tester import *
 from res import *
 from PyQt5.QtGui import QPixmap, QKeyEvent
 
+host = 'http://127.0.0.1:5000'
+host = 'https://KOJlGylHl.pythonanywhere.com'
+
+
+def hash_password(password: str, salt: bytes = None, iterations=100000) -> tuple:
+    """Генерирует хеш пароля с солью (PBKDF2-HMAC-SHA256)."""
+    if salt is None:
+        salt = os.urandom(16)  # 128-битная соль
+    key = hashlib.pbkdf2_hmac(
+        'sha256',
+        password.encode('utf-8'),
+        salt,
+        iterations
+    )
+    return salt.hex(), key.hex()
+
+
+def verify_password(password: str, salt: str, hashed: str) -> bool:
+    new_hash = hashlib.pbkdf2_hmac(
+        'sha256',
+        password.encode('utf-8'),
+        bytes.fromhex(salt),
+        100000
+    ).hex()
+    return new_hash == hashed
+
+
+def check_password_strength(password):
+    score = 0
+
+    if len(password) >= 8:
+        score += 1
+    else:
+        return 1
+
+    if re.search(r"\d", password):
+        score += 1
+
+    if re.search(r"[a-z]", password) and re.search(r"[A-Z]", password):
+        score += 1
+
+    if re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
+        score += 1
+
+    return score
 
 
 # from bot import send_result
@@ -27,26 +78,35 @@ def generate_code(length=8):
 
 
 def password_level(password):
-    return 'ok'
+    score = check_password_strength(password)
+    if score == 4:
+        return 'ok'
+    else:
+        return 'Пароль должен состоять хотя бы из 8 символов, включая оба регистра и спец. символы.'
 
 
 def get_from_db(data):
     data = json.dumps(data)
-    return requests.get('http://127.0.0.1:5000', data=data).json()
+    ans = requests.get(host, data=data).json()
+    print(ans)
+    return ans
+
 
 def get_img(data):
     data = json.dumps(data)
-    return requests.get('http://127.0.0.1:5000', data=data)
+    return requests.get(host, data=data)
 
 
 def post_in_db(data):
     data = json.dumps(data)
-    requests.post('http://127.0.0.1:5000/', data=data)
+    requests.post(host, data=data)
     return None
 
+
 def post_images(files):
-    requests.post('http://127.0.0.1:5000/', files=files)
+    requests.post(host, files=files)
     return None
+
 
 class FirstMenu(QMainWindow, Ui_start):
     def __init__(self):
@@ -89,9 +149,17 @@ class LogIn(QMainWindow, Ui_log_in):
         password = self.password.text()
         logins = get_from_db(['login', 'user', 'id > 0'])
         logins = list(map(lambda x: x[0], logins))
+        if login not in logins:
+            self.statusbar.showMessage('Неправильный логин или пароль')
+            self.login.setText('')
+            self.password.setText('')
+            return
+        salt = get_from_db(['salt', 'salts', f'login="{login}"'])
+        salt = list(map(lambda x: x[0], salt))[0]
         passwords = get_from_db(['password', 'user', f'login="{login}"'])
-        passwords = list(map(lambda x: x[0], passwords))
-        if login not in logins or password not in passwords:
+        hashed = list(map(lambda x: x[0], passwords))[0]
+        eq_pass = verify_password(password, salt, hashed)
+        if not eq_pass:
             self.statusbar.showMessage('Неправильный логин или пароль')
             self.login.setText('')
             self.password.setText('')
@@ -105,7 +173,6 @@ class LogIn(QMainWindow, Ui_log_in):
             self.new_form = NewTest(login)
             self.new_form.show()
             self.close()
-
 
 
 class Registration(QMainWindow, Ui_Registration):
@@ -142,9 +209,11 @@ class Registration(QMainWindow, Ui_Registration):
         n = 0
         if self.comboBox.currentText() == 'Учитель':
             n = 1
+        salt, hashed = hash_password(self.password1Edit.text())
         post_in_db(
             ['insert', 'user(login, username, password, status)',
-             f'{self.loginEdit.text()} {self.usernameEdit.text()} {self.password1Edit.text()} {n}'])
+             f'{self.loginEdit.text()} {self.usernameEdit.text()} {hashed} {n}'])
+        post_in_db(['insert', 'salts(login, salt)', f'{self.loginEdit.text()} {salt}'])
         self.new_form = LogIn()
         self.new_form.show()
         self.close()
@@ -180,6 +249,7 @@ class StudentMenu(QMainWindow, Ui_StudentMenu):
 class NewTest(QMainWindow, Ui_NewTest):
     def __init__(self, login):
         super().__init__()
+        self.copied = False
         self.answers = []
         self.login = login
         self.setupUi(self)
@@ -187,30 +257,36 @@ class NewTest(QMainWindow, Ui_NewTest):
         self.cleaButton.clicked.connect(self.clear)
         self.loadButton.clicked.connect(self.load)
         self.pushButton.clicked.connect(self.back)
-        self.pushButton_2.clicked.connect(self.result)
+        # self.pushButton_2.clicked.connect(self.result)
         self.btn.clicked.connect(self.load_image)
         self.image = []
         self.counter = 0
         self.aditive = 0
         self.codeEdit.setText(generate_code())
         self.pushButton_3.clicked.connect(self.copy_code)
+        self.comboBox.clear()
+        items = ["1", "2", '3', '4', '5']
+        self.comboBox.addItems(items)
+        self.addAnsButton_2.clicked.connect(self.all_works)
+        self.comboBox.setCurrentIndex(0)
 
     def copy_code(self):
         text = self.codeEdit.text()
         clipboard = QApplication.clipboard()
         clipboard.setText(text)
+        self.copied = True
         self.statusbar.showMessage('Код скопирован.')
 
     def load_image(self):
         options = QFileDialog.Options()
         image_path, _ = QFileDialog.getOpenFileName(self, "Выберите изображение", "",
-                                                   "Images (*.png *.jpg *.bmp);;All Files (*)", options=options)
+                                                    "Images (*.png *.jpg *.bmp);;All Files (*)", options=options)
         print(image_path)
         self.image.append(['file', open(image_path, 'rb')])
         self.aditive = 1
 
-    def result(self):
-        self.next_form = Results(self.login, self.codeEdit.text())
+    def all_works(self):
+        self.next_form = Results(self.login)
         self.next_form.show()
         self.close()
 
@@ -226,20 +302,27 @@ class NewTest(QMainWindow, Ui_NewTest):
             self.answerEdit.setText('')
             return
         if self.aditive == 0:
-            s = self.qwestionEdit.toPlainText() + ',,,,' + self.answerEdit.text()
+            s = self.qwestionEdit.toPlainText() + f'&{self.comboBox.currentText()}&' + ',,,,' + self.answerEdit.text()
         else:
 
-            s = self.qwestionEdit.toPlainText() + f'i{self.counter}' + ',,,,' + self.answerEdit.text()   #i - изображение
+            s = self.qwestionEdit.toPlainText() + f'&{self.comboBox.currentText()}&' + f'i{self.counter}' + ',,,,' + self.answerEdit.text()  # i - изображение
             self.counter += self.aditive
         self.answers.append(s)
         self.qwestionEdit.setText('')
         self.answerEdit.setText('')
+        self.statusbar.showMessage('Вопрос добавлен')
 
     def clear(self):
         self.answerEdit.setText('')
         self.qwestionEdit.setText('')
 
     def load(self):
+        if not self.copied:
+            self.statusbar.showMessage('Скопируйте код.')
+            return
+        if self.name_of_work.text() == '':
+            self.statusbar.showMessage('Напишите название работы.')
+            return
         if len(self.answers) == 0:
             self.statusbar.showMessage('Нет вопросов')
             return
@@ -261,37 +344,30 @@ class NewTest(QMainWindow, Ui_NewTest):
             self.image[i] = tuple(self.image[i])
         post_in_db(['insert', 'test(key, t, author)', f'{self.codeEdit.text()} {self.answers} {self.login}'])
         post_images(files=self.image)
+        post_in_db(['insert', 'works(key, name)', f'{self.codeEdit.text()} {self.name_of_work.text()}'])
         self.statusbar.showMessage('Проверочная создана успешно')
 
 
 class Results(QMainWindow, Ui_Res):
-    def __init__(self, login, code):
+    def __init__(self, login):
         super().__init__()
-        self.code = code
         self.new_form = None
         self.answers = []
         self.login = login
         self.setupUi(self)
         self.pushButton.clicked.connect(self.back)
-        res = get_from_db(['results', 'test', f'author="{self.login}" and key="{self.code}"'])
-        if not res:
-            self.statusbar.showMessage('результатов по такому коду не найдено')
-            return
-        else:
-            res = res[0][0]
-        res = res.split(',,')
-        res[1] = res[1].split('***')
-        res[1] = '\n'.join(res[1])
-        res = ';'.join(res).rstrip('***')
-        res = res.split('\n')
-        for i in range(len(res)):
-            res[i] = res[i].split(';')
-            login = res[i][0]
-            username = get_from_db(['username', 'user', f'login="{login}"'])[0][0]
-            res[i][0] = username
-            res[i] = ';'.join(res[i])
-        res = '\n'.join(res)
-        self.textBrowser.setText(res)
+        keys = get_from_db(['key', 'test', f'author="{self.login}"'])
+        print(keys)
+        s = ''
+        for key in keys:
+            key = key[0]
+            try:
+                work = get_from_db(['name', 'works', f'key="{key}"'])[0][0]
+            except:
+                work = 'Нет названия'
+            s += f'Название работы: {work}, ключ работы: {key}' + '\n'
+
+        self.textBrowser.setText(s)
 
     def back(self):
         self.new_form = NewTest(self.login)
@@ -310,6 +386,7 @@ class Tester(QMainWindow, Ui_Tester):
         # Внутри test пары вопрос ответ через *** а внутри через ,,,,
         self.test = test.split('***')
         self.test = list(map(lambda x: x.split(',,,,'), self.test))
+        print('self.test:', self.test)
         self.user_answers = ['' for _ in range(len(self.test))]
         self.saveButton.clicked.connect(self.save)
         self.previewButton.clicked.connect(self.preview)
@@ -319,7 +396,7 @@ class Tester(QMainWindow, Ui_Tester):
         self.index = -1
         if 'i' in self.test[self.current_qwe][0]:
             self.index = self.test[self.current_qwe][0][self.test[self.current_qwe][0].index('i') + 1:]
-        self.qwestionText.setText(self.test[self.current_qwe][0][:self.test[self.current_qwe][0].index('i')])
+        self.qwestionText.setText(self.test[self.current_qwe][0][:self.test[self.current_qwe][0].index('&')])
         self.max_qwe = len(self.test) - 1
         self.pushButton.clicked.connect(self.back)
         if self.index != -1:
@@ -413,7 +490,7 @@ class Tester(QMainWindow, Ui_Tester):
         self.current_qwe = self.current_qwe - 1
         if 'i' in self.test[self.current_qwe][0]:
             self.index = self.test[self.current_qwe][0][self.test[self.current_qwe][0].index('i') + 1:]
-        self.qwestionText.setText(self.test[self.current_qwe][0][:self.test[self.current_qwe][0].index('i')])
+        self.qwestionText.setText(self.test[self.current_qwe][0][:self.test[self.current_qwe][0].index('&')])
         if self.index != -1:
             s = '\\'
             filename = f'images{s}{self.key}{self.index}'
@@ -431,7 +508,7 @@ class Tester(QMainWindow, Ui_Tester):
         self.current_qwe = self.current_qwe + 1
         if 'i' in self.test[self.current_qwe][0]:
             self.index = self.test[self.current_qwe][0][self.test[self.current_qwe][0].index('i') + 1:]
-        self.qwestionText.setText(self.test[self.current_qwe][0][:self.test[self.current_qwe][0].index('i')])
+        self.qwestionText.setText(self.test[self.current_qwe][0][:self.test[self.current_qwe][0].index('&')])
         if self.index != -1:
             s = '\\'
             filename = f'images{s}{self.key}{self.index}'
@@ -448,19 +525,24 @@ class Tester(QMainWindow, Ui_Tester):
             if self.login in logins.split('***'):
                 self.statusbar.showMessage('Вы уже выполнили тестирование')
                 return
+        sp = []
         for i in range(self.max_qwe + 1):
             if self.user_answers[i] == self.test[i][1]:
-                self.results.append(True)
+                test_i = self.test[i][0]
+                sp.append([int(test_i[test_i.index('&') + 1:test_i.index('&') + 2]), True])
             else:
-                self.results.append(False)
-        res = self.login + ',,' + str(self.results.count(True)) + ' of ' + str(len(self.results))
+                test_i = self.test[i][0]
+                sp.append([int(test_i[test_i.index('&') + 1:test_i.index('&') + 2]), False])
+        res = self.login + repr(sp)
+        res = res.replace(',', '%')
         pre = get_from_db(['results', 'test', f'key="{self.key}"'])[0][0]
         if pre is None:
             pre = res + '***'
         else:
             pre += res + '***'
-        print(pre)
+        # print(pre)
         post_in_db(['update', 'test', f'results="{pre}"', f'key="{self.key}"'])
+        # print(['update', 'test', f'results="{pre}"', f'key="{self.key}"'])
         pre = get_from_db(['logins', 'test', f'key="{self.key}"'])[0][0]
         if pre is None:
             pre = self.login + '***'

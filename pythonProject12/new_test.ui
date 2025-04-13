@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>784</width>
+    <height>702</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -371,7 +371,7 @@ QToolBar::separator {
      <rect>
       <x>280</x>
       <y>20</y>
-      <width>231</width>
+      <width>151</width>
       <height>51</height>
      </rect>
     </property>
@@ -388,15 +388,15 @@ QToolBar::separator {
      <string notr="true">font: 75 14pt &quot;MS Shell Dlg 2&quot;;</string>
     </property>
     <property name="text">
-     <string>Создание проверочной</string>
+     <string>Окно учителя</string>
     </property>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget_3">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>350</y>
-      <width>636</width>
+      <x>90</x>
+      <y>400</y>
+      <width>601</width>
       <height>61</height>
      </rect>
     </property>
@@ -429,8 +429,8 @@ QToolBar::separator {
    <widget class="QWidget" name="horizontalLayoutWidget_4">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>430</y>
+      <x>90</x>
+      <y>540</y>
       <width>386</width>
       <height>61</height>
      </rect>
@@ -477,27 +477,11 @@ QToolBar::separator {
      <string>&lt;---   Вернуться</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>510</y>
-      <width>201</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
-    </property>
-    <property name="text">
-     <string>Узнать результаты</string>
-    </property>
-   </widget>
    <widget class="QCommandLinkButton" name="loadButton">
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>510</y>
+      <x>480</x>
+      <y>610</y>
       <width>211</width>
       <height>41</height>
      </rect>
@@ -512,8 +496,8 @@ QToolBar::separator {
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>100</y>
+      <x>90</x>
+      <y>150</y>
       <width>601</width>
       <height>231</height>
      </rect>
@@ -600,14 +584,91 @@ font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
    <widget class="QPushButton" name="pushButton_3">
     <property name="geometry">
      <rect>
-      <x>500</x>
-      <y>440</y>
+      <x>510</x>
+      <y>550</y>
       <width>181</width>
       <height>41</height>
      </rect>
     </property>
     <property name="text">
      <string>Скопировать код</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBox">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>480</y>
+      <width>131</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>480</y>
+      <width>221</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Установите баллы зазадачу</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="name_of_work">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>80</y>
+      <width>341</width>
+      <height>51</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>80</y>
+      <width>231</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Shell Dlg 2</family>
+      <pointsize>14</pointsize>
+      <weight>9</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 75 14pt &quot;MS Shell Dlg 2&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Название работы</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="all_works_button">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>610</y>
+      <width>240</width>
+      <height>47</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="text">
+     <string>Посмотреть работы</string>
     </property>
    </widget>
   </widget>

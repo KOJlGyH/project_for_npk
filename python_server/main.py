@@ -5,6 +5,7 @@ import json
 app = Flask(__name__)
 
 
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == "GET":
@@ -65,8 +66,11 @@ def index():
             data = list(map(lambda x: x.rstrip('"').lstrip('"'), data))
             table = data[1]
             values = data[2].split()
-            if table[:table.index('(')] in ['user', 'test', 'tg']:
-                if len(values) == 3:
+            if table[:table.index('(')] in ['user', 'test', 'tg', 'salts']:
+                if len(values) == 2:
+                    cur.execute(f'insert into {table} values(?, ?)', values)
+                    con.commit()
+                elif len(values) == 3:
                     key = values[0]
                     files = request.files
                     # print(files)
@@ -80,6 +84,7 @@ def index():
                 return '0'
         if command == 'update':
             #print(1)
+            print(data)
             data = data.split(', ')
             data = list(map(lambda x: x.rstrip('"').lstrip('"'), data))
             data1 = []
@@ -90,6 +95,7 @@ def index():
                         string += symbol
                 data1.append(string)
             data = data1.copy()
+            print(data)
             table = data[1]
             values = data[2] + '"'
             where = data[3] + '"'
