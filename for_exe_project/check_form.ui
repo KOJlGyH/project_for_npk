@@ -1,0 +1,728 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1287</width>
+    <height>797</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">/* General Settings */
+QWidget {
+    font-family: &quot;Comic Sans MS&quot;; /* Fun and playful font */
+    font-size: 14px;
+    color: #2c3e50; /* Dark blue for text */
+    background-color: #f9f9f9; /* Light gray background */
+}
+
+/* Background Images for Different Pages */
+QWidget#mathPage {
+    background-image: url(:/backgrounds/math_background.png); /* Math-themed background */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+QWidget#sciencePage {
+    background-image: url(:/backgrounds/science_background.png); /* Science-themed background */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+QWidget#literaturePage {
+    background-image: url(:/backgrounds/literature_background.png); /* Literature-themed background */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+QWidget#historyPage {
+    background-image: url(:/backgrounds/history_background.png); /* History-themed background */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+/* Buttons */
+QPushButton {
+    background-color: #ff6f61; /* Coral */
+    color: white;
+    border: 2px solid #ff3b2f; /* Darker coral */
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+QPushButton:hover {
+    background-color: #ff3b2f; /* Darker coral on hover */
+}
+
+QPushButton:pressed {
+    background-color: #ff1a1a; /* Even darker coral when pressed */
+}
+
+QPushButton:disabled {
+    background-color: #bdc3c7; /* Gray */
+    color: #7f8c8d; /* Light gray text */
+    border: 2px solid #95a5a6;
+}
+
+/* Line Edits */
+QLineEdit {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+    border: 2px solid #3498db; /* Blue border */
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 14px;
+}
+
+QLineEdit:focus {
+    border: 2px solid #ff6f61; /* Coral border when focused */
+}
+
+/* Labels */
+QLabel {
+    color: #2c3e50; /* Dark blue */
+    font-size: 14px;
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+    border-radius: 10px;
+    padding: 10px;
+}
+
+QLabel#titleLabel {
+    font-size: 24px;
+    font-weight: bold;
+    color: #3498db; /* Blue for titles */
+    background-color: transparent; /* No background for titles */
+}
+
+/* Combo Boxes */
+QComboBox {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+    border: 2px solid #3498db; /* Blue border */
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 14px;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 30px;
+    border-left: 2px solid #3498db;
+}
+
+QComboBox::down-arrow {
+    image: url(:/icons/down_arrow.png); /* Replace with your icon */
+}
+
+QComboBox QAbstractItemView {
+    background-color: white;
+    border: 2px solid #3498db;
+    selection-background-color: #ff6f61; /* Coral for selected item */
+    selection-color: white;
+}
+
+/* Check Boxes */
+QCheckBox {
+    color: #2c3e50;
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+    border-radius: 10px;
+    padding: 10px;
+}
+
+QCheckBox::indicator {
+    width: 20px;
+    height: 20px;
+}
+
+QCheckBox::indicator:checked {
+    image: url(:/icons/checked.png); /* Replace with your icon */
+}
+
+QCheckBox::indicator:unchecked {
+    image: url(:/icons/unchecked.png); /* Replace with your icon */
+}
+
+/* Radio Buttons */
+QRadioButton {
+    color: #2c3e50;
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+    border-radius: 10px;
+    padding: 10px;
+}
+
+QRadioButton::indicator {
+    width: 20px;
+    height: 20px;
+}
+
+QRadioButton::indicator:checked {
+    image: url(:/icons/radio_checked.png); /* Replace with your icon */
+}
+
+QRadioButton::indicator:unchecked {
+    image: url(:/icons/radio_unchecked.png); /* Replace with your icon */
+}
+
+/* Progress Bars */
+QProgressBar {
+    background-color: #bdc3c7;
+    border: 2px solid #95a5a6;
+    border-radius: 10px;
+    text-align: center;
+    color: #2c3e50;
+}
+
+QProgressBar::chunk {
+    background-color: #ff6f61; /* Coral */
+    border-radius: 10px;
+}
+
+/* Spin Boxes */
+QSpinBox {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+    border: 2px solid #3498db; /* Blue border */
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 14px;
+}
+
+QSpinBox::up-button, QSpinBox::down-button {
+    subcontrol-origin: border;
+    subcontrol-position: top right;
+    width: 30px;
+    border-left: 2px solid #3498db;
+}
+
+QSpinBox::up-arrow {
+    image: url(:/icons/up_arrow.png); /* Replace with your icon */
+}
+
+QSpinBox::down-arrow {
+    image: url(:/icons/down_arrow.png); /* Replace with your icon */
+}
+
+/* Group Boxes */
+QGroupBox {
+    border: 2px solid #3498db; /* Blue border */
+    border-radius: 10px;
+    margin-top: 10px;
+    padding-top: 15px;
+    font-weight: bold;
+    color: #3498db; /* Blue for group box titles */
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 0 10px;
+}
+
+/* Tabs */
+QTabWidget::pane {
+    border: 2px solid #3498db; /* Blue border */
+    border-radius: 10px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+}
+
+QTabBar::tab {
+    background-color: #ecf0f1;
+    border: 2px solid #3498db;
+    border-bottom: none;
+    padding: 10px 20px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    font-size: 14px;
+}
+
+QTabBar::tab:selected {
+    background-color: white;
+    border-bottom: 2px solid white;
+}
+
+QTabBar::tab:hover {
+    background-color: #ff6f61; /* Coral on hover */
+    color: white;
+}
+
+/* Scroll Bars */
+QScrollBar:horizontal, QScrollBar:vertical {
+    background-color: #ecf0f1;
+    border-radius: 10px;
+}
+
+QScrollBar::handle:horizontal, QScrollBar::handle:vertical {
+    background-color: #ff6f61; /* Coral */
+    border-radius: 10px;
+}
+
+QScrollBar::add-line, QScrollBar::sub-line {
+    background: none;
+}
+
+/* Tool Tips */
+QToolTip {
+    background-color: #ff6f61; /* Coral */
+    color: white;
+    border: 2px solid #ff3b2f;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* Menus */
+QMenuBar {
+    background-color: #ecf0f1;
+    color: #2c3e50;
+}
+
+QMenuBar::item {
+    padding: 10px 20px;
+}
+
+QMenuBar::item:selected {
+    background-color: #ff6f61; /* Coral */
+    color: white;
+}
+
+QMenu {
+    background-color: white;
+    border: 2px solid #3498db;
+    padding: 10px;
+}
+
+QMenu::item {
+    padding: 10px 20px;
+}
+
+QMenu::item:selected {
+    background-color: #ff6f61; /* Coral */
+    color: white;
+}
+
+/* Tables */
+QTableView {
+    background-color: white;
+    border: 2px solid #3498db;
+    border-radius: 10px;
+}
+
+QTableView::item {
+    padding: 10px;
+}
+
+QTableView::item:selected {
+    background-color: #ff6f61; /* Coral */
+    color: white;
+}
+
+/* Text Edit */
+QTextEdit {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+    border: 2px solid #3498db;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+QTextEdit:focus {
+    border: 2px solid #ff6f61; /* Coral */
+}
+
+/* Status Bar */
+QStatusBar {
+    background-color: #ecf0f1;
+    border-top: 2px solid #3498db;
+    padding: 10px;
+}
+
+/* Tool Bars */
+QToolBar {
+    background-color: #ecf0f1;
+    border-bottom: 2px solid #3498db;
+    padding: 10px;
+}
+
+QToolBar::separator {
+    background-color: #3498db;
+    width: 2px;
+    margin: 10px;
+}</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>30</y>
+      <width>281</width>
+      <height>69</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Comic Sans MS</family>
+      <pointsize>-1</pointsize>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font-size: 20px;</string>
+    </property>
+    <property name="text">
+     <string>Форма проверки работы</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="endButton">
+    <property name="geometry">
+     <rect>
+      <x>1040</x>
+      <y>40</y>
+      <width>211</width>
+      <height>47</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="text">
+     <string>Завершить проверку</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
+      <y>110</y>
+      <width>227</width>
+      <height>69</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Comic Sans MS</family>
+      <pointsize>-1</pointsize>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font-size: 20px;</string>
+    </property>
+    <property name="text">
+     <string>Правильный ответ</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_7">
+    <property name="geometry">
+     <rect>
+      <x>920</x>
+      <y>100</y>
+      <width>251</width>
+      <height>69</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Comic Sans MS</family>
+      <pointsize>-1</pointsize>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font-size: 20px;</string>
+    </property>
+    <property name="text">
+     <string>Картинка для вопроса</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>100</y>
+      <width>227</width>
+      <height>69</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Comic Sans MS</family>
+      <pointsize>-1</pointsize>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font-size: 20px;</string>
+    </property>
+    <property name="text">
+     <string>Вопрос</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="back_button">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>20</y>
+      <width>177</width>
+      <height>47</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="text">
+     <string>&lt;--- Вернуться</string>
+    </property>
+   </widget>
+   <widget class="QTextBrowser" name="qwestionEdit">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>190</y>
+      <width>351</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+   </widget>
+   <widget class="QTextBrowser" name="answerEdit">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>460</x>
+      <y>190</y>
+      <width>351</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="imageLabel">
+    <property name="geometry">
+     <rect>
+      <x>880</x>
+      <y>190</y>
+      <width>321</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>410</y>
+      <width>227</width>
+      <height>69</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Comic Sans MS</family>
+      <pointsize>-1</pointsize>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font-size: 20px;</string>
+    </property>
+    <property name="text">
+     <string>Ответ ученика</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QTextBrowser" name="useranswerEdit">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>500</y>
+      <width>351</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_8">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>420</y>
+      <width>421</width>
+      <height>69</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Comic Sans MS</family>
+      <pointsize>-1</pointsize>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font-size: 20px;</string>
+    </property>
+    <property name="text">
+     <string>Изображение, прикреплённое учеником</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="userimageLabel">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>500</y>
+      <width>401</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_9">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>420</y>
+      <width>261</width>
+      <height>69</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Comic Sans MS</family>
+      <pointsize>-1</pointsize>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font-size: 20px;</string>
+    </property>
+    <property name="text">
+     <string>Балл за задачу</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBox">
+    <property name="geometry">
+     <rect>
+      <x>850</x>
+      <y>560</y>
+      <width>161</width>
+      <height>51</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>840</x>
+      <y>630</y>
+      <width>441</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="spacing">
+      <number>30</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="previewButton">
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string>Предыдущий вопрос</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="nextButton">
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string>Следующий вопрос</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1287</width>
+     <height>40</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

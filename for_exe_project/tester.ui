@@ -538,6 +538,22 @@ QToolBar::separator {
      <string/>
     </property>
    </widget>
+   <widget class="QPushButton" name="btn">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>300</y>
+      <width>251</width>
+      <height>47</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string>0</string>
+    </property>
+    <property name="text">
+     <string>Загрузить изображение</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
