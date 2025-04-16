@@ -44,7 +44,7 @@ def registration():
         cur = con.cursor()
         logins = cur.execute('''select login from user where id > 0''').fetchall()
         logins = list(map(lambda x: x[0], logins))
-        logins = list(map(lambda x: x[0], logins))
+        print(logins)
         if login in logins:
             return jsonify({"message": "Такой логин уже существует"}), 300
         n = 0
@@ -118,14 +118,14 @@ def new_test():
                     [key, questions, answers, points, login])
         cur.execute('insert into works(key, name) values(?, ?)', [key, name_of_work])
         con.commit()
+        return jsonify({"message": "Работа успешно загружена"}), 200
     except:
-        return jsonify({"message": "Упс, что-то пошло не так"}), 500
-    con.commit()
-    return jsonify({"message": "Работа успешно загружена"}), 200
+        return jsonify({"message": "Упс, что-то пошло не так..."}), 500
 
 
 @app.route('/load_images/<key>/<login>/<password>/<status>', methods=['POST'])
 def load_images(key, login, password, status):
+    print(key, login, password, status)
     con = sqlite3.connect('database.db')
     cur = con.cursor()
 
@@ -198,39 +198,42 @@ def results():
 
 @app.route('/student_menu', methods=['POST'])
 def student_menu():
-    data = request.get_json()
-    login = data['login']
-    password = data['password']
-    key = data['key']
-    con = sqlite3.connect('database.db')
-    cur = con.cursor()
-
-    logins = cur.execute('select login from user where id > 0').fetchall()
-    logins = list(map(lambda x: x[0], logins))
-    if login not in logins:
-        return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
     try:
-        hashed = cur.execute(f'select password from user where login="{login}"').fetchall()[0][0]
-        salt = cur.execute(f'select salt from salts where login="{login}"')
-        salt = list(map(lambda x: x[0], salt))[0]
-    except:
-        return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
-    eq_pass = verify_password(password, salt, hashed)
-    if not eq_pass:
-        return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+        data = request.get_json()
+        login = data['login']
+        password = data['password']
+        key = data['key']
+        con = sqlite3.connect('database.db')
+        cur = con.cursor()
 
-    keys = cur.execute(f'select key from test where id > 0').fetchall()
-    keys = list(map(lambda x: x[0], keys))
-    if key not in keys:
-        return jsonify({"message": "Ключ не действителен"}), 300
-    logins = cur.execute(f'select logins from test where key="{key}"').fetchall()[0][0]
-    if logins is None:
-        logins = []
-    else:
-        logins = ast.literal_eval(logins)
-    if login in logins:
-        return jsonify({"message": "Вы уже писали эту работу"}), 300
-    return jsonify({"message": "Всё хорошо."}), 200
+        logins = cur.execute('select login from user where id > 0').fetchall()
+        logins = list(map(lambda x: x[0], logins))
+        if login not in logins:
+            return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+        try:
+            hashed = cur.execute(f'select password from user where login="{login}"').fetchall()[0][0]
+            salt = cur.execute(f'select salt from salts where login="{login}"')
+            salt = list(map(lambda x: x[0], salt))[0]
+        except:
+            return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+        eq_pass = verify_password(password, salt, hashed)
+        if not eq_pass:
+            return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+
+        keys = cur.execute(f'select key from test where id > 0').fetchall()
+        keys = list(map(lambda x: x[0], keys))
+        if key not in keys:
+            return jsonify({"message": "Ключ не действителен"}), 300
+        logins = cur.execute(f'select logins from test where key="{key}"').fetchall()[0][0]
+        if logins is None:
+            logins = []
+        else:
+            logins = ast.literal_eval(logins)
+        if login in logins:
+            return jsonify({"message": "Вы уже писали эту работу"}), 300
+        return jsonify({"message": "Всё хорошо."}), 200
+    except:
+        return jsonify({"message": "Упс, что-то пошло не так..."}), 500
 
 
 @app.route('/tester', methods=['POST'])
@@ -271,79 +274,92 @@ def tester():
                         'points': points,
                         'pre': pre}), 200
     except:
-        return jsonify({"message": "Упс, что-то пошло не так..."}), 200
+        return jsonify({"message": "Упс, что-то пошло не так..."}), 500
 
 
 @app.route('/send_image', methods=['GET'])
 def send_image():
-    data = ast.literal_eval(request.get_json())
-    filename = data['filename']
-    login = data['login']
-    password = data['password']
-
-    con = sqlite3.connect('database.db')
-    cur = con.cursor()
-
-    logins = cur.execute('select login from user where id > 0').fetchall()
-    logins = list(map(lambda x: x[0], logins))
-    if login not in logins:
-        return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
     try:
-        hashed = cur.execute(f'select password from user where login="{login}"').fetchall()[0][0]
-        salt = cur.execute(f'select salt from salts where login="{login}"')
-        salt = list(map(lambda x: x[0], salt))[0]
-    except:
-        return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
-    eq_pass = verify_password(password, salt, hashed)
-    if not eq_pass:
-        return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+        data = ast.literal_eval(request.get_json())
+        filename = data['filename']
+        login = data['login']
+        password = data['password']
 
-    try:
-        return send_file(filename + '.jpg', mimetype='image/jpeg')
+        con = sqlite3.connect('database.db')
+        cur = con.cursor()
+
+        logins = cur.execute('select login from user where id > 0').fetchall()
+        logins = list(map(lambda x: x[0], logins))
+        if login not in logins:
+            return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+        try:
+            hashed = cur.execute(f'select password from user where login="{login}"').fetchall()[0][0]
+            salt = cur.execute(f'select salt from salts where login="{login}"')
+            salt = list(map(lambda x: x[0], salt))[0]
+        except:
+            return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+        eq_pass = verify_password(password, salt, hashed)
+        if not eq_pass:
+            return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+
+        try:
+            return send_file(filename + '.jpg', mimetype='image/jpeg')
+        except:
+            return '0'
     except:
-        return '0'
+        return jsonify({"message": "Упс, что-то пошло не так..."}), 500
 
 
 @app.route('/update_results', methods=['POST'])
 def update_results():
-    data = request.get_json()
-    login = data['login']
-    res = data['res']
-    key = data['key']
-    password = data['password']
-    con = sqlite3.connect('database.db')
-    cur = con.cursor()
-
-    logins = cur.execute('select login from user where id > 0').fetchall()
-    logins = list(map(lambda x: x[0], logins))
-    if login not in logins:
-        return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
     try:
-        hashed = cur.execute(f'select password from user where login="{login}"').fetchall()[0][0]
-        salt = cur.execute(f'select salt from salts where login="{login}"')
-        salt = list(map(lambda x: x[0], salt))[0]
-    except:
-        return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
-    eq_pass = verify_password(password, salt, hashed)
-    if not eq_pass:
-        return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+        data = request.get_json()
+        login = data['login']
+        res = data['res']
+        key = data['key']
+        password = data['password']
+        con = sqlite3.connect('database.db')
+        cur = con.cursor()
 
-    pre = cur.execute(f'select results from test where key="{key}"').fetchall()[0][0]
-    if pre == '':
-        pre = []
-    else:
-        pre = ast.literal_eval(pre)
-    pre.append(res)
-    cur.execute(f'update test set results="{repr(pre)}" where key="{key}"')
-    pre_log = cur.execute(f'select logins from test where key="{key}"').fetchall()[0][0]
-    if pre_log is None:
-        pre_log = []
-    else:
-        pre_log = ast.literal_eval(pre_log)
-    pre_log.append(login)
-    cur.execute(f'update test set logins="{repr(pre_log)}" where key="{key}"')
-    con.commit()
-    return jsonify({"message": "Работа завершена"}), 200
+        logins = cur.execute('select login from user where id > 0').fetchall()
+        logins = list(map(lambda x: x[0], logins))
+        if login not in logins:
+            return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+        try:
+            hashed = cur.execute(f'select password from user where login="{login}"').fetchall()[0][0]
+            salt = cur.execute(f'select salt from salts where login="{login}"')
+            salt = list(map(lambda x: x[0], salt))[0]
+        except:
+            return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+        eq_pass = verify_password(password, salt, hashed)
+        if not eq_pass:
+            return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+
+        logins = cur.execute(f'select logins from test where key="{key}"').fetchall()[0][0]
+        if logins is None:
+            logins = []
+        else:
+            logins = ast.literal_eval(logins)
+        pre = cur.execute(f'select results from test where key="{key}"').fetchall()[0][0]
+        if pre == '':
+            pre = []
+        else:
+            pre = ast.literal_eval(pre)
+        if login in logins:
+            return jsonify({"message": "Кажется, вы уже отправляли эту работу"}), 300
+        pre.append(res)
+        cur.execute(f'update test set results="{repr(pre)}" where key="{key}"')
+        pre_log = cur.execute(f'select logins from test where key="{key}"').fetchall()[0][0]
+        if pre_log is None:
+            pre_log = []
+        else:
+            pre_log = ast.literal_eval(pre_log)
+        pre_log.append(login)
+        cur.execute(f'update test set logins="{repr(pre_log)}" where key="{key}"')
+        con.commit()
+        return jsonify({"message": "Работа завершена"}), 200
+    except:
+        return jsonify({"message": "Упс, что-то пошло не так..."}), 500
 
 
 
@@ -399,76 +415,93 @@ def get_res():
         cur = con.cursor()
         login = cur.execute(f'select login from tg where tg_id="{chat_id}"').fetchall()[0][0]
         result = cur.execute(f'select results from test where author="{login}" and key="{key}"').fetchall()[0][0]
+        result = ast.literal_eval(result)
+        for i in range(len(result)):
+            username = cur.execute(f'select username from user where login="{result[i][0]}"').fetchall()[0][0]
+            result[i][0] = username
+        points = cur.execute(f'select points from test where author="{login}" and key="{key}"').fetchall()[0][0]
         if len(result) == 0:
             return jsonify({"message": "К сожалению я не нашёл такой работы или результатов пока что нет"}), 300
-        return jsonify({"result": ast.literal_eval(result)}), 200
+        return jsonify({"result": result, 'points': ast.literal_eval(points)}), 200
     except:
         return jsonify({"message": "Упс, что-то пошло не так..."}), 500
 
 @app.route('/to_check_work', methods=['POST'])
 def to_check_work():
-    data = request.get_json()
-    login = data['login']
-    password = data['password']
-    key = data['key']
-
-    con = sqlite3.connect('database.db')
-    cur = con.cursor()
-
-    logins = cur.execute('select login from user where id > 0').fetchall()
-    logins = list(map(lambda x: x[0], logins))
-    if login not in logins:
-        return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
     try:
-        hashed = cur.execute(f'select password from user where login="{login}"').fetchall()[0][0]
-        salt = cur.execute(f'select salt from salts where login="{login}"')
-        salt = list(map(lambda x: x[0], salt))[0]
-    except:
-        return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
-    eq_pass = verify_password(password, salt, hashed)
-    if not eq_pass:
-        return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+        data = request.get_json()
+        login = data['login']
+        password = data['password']
+        key = data['key']
 
-    author = cur.execute(f'select author from test where key="{key}"').fetchall()[0][0]
-    if author != login:
-        return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
-    return jsonify({"message": "Всё хорошо."}), 200
+        con = sqlite3.connect('database.db')
+        cur = con.cursor()
+
+        logins = cur.execute('select login from user where id > 0').fetchall()
+        logins = list(map(lambda x: x[0], logins))
+        if login not in logins:
+            return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+        try:
+            hashed = cur.execute(f'select password from user where login="{login}"').fetchall()[0][0]
+            salt = cur.execute(f'select salt from salts where login="{login}"')
+            salt = list(map(lambda x: x[0], salt))[0]
+        except:
+            return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+        eq_pass = verify_password(password, salt, hashed)
+        if not eq_pass:
+            return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+
+        author = cur.execute(f'select author from test where key="{key}"').fetchall()
+        #[0][0]
+        if author == []:
+            return jsonify({"message": "Что-то не так с ключом"}), 300
+        print(author)
+        author = author[0][0]
+        if author != login:
+            return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+        return jsonify({"message": "Всё хорошо."}), 200
+    except:
+        return jsonify({"message": "Упс, что-то пошло не так..."}), 500
+
 
 
 @app.route('/logins_by_key', methods=['POST'])
 def logins_by_key():
-    data = request.get_json()
-    login = data['login']
-    password = data['password']
-    key = data['key']
-
-    con = sqlite3.connect('database.db')
-    cur = con.cursor()
-
-    logins = cur.execute('select login from user where id > 0').fetchall()
-    logins = list(map(lambda x: x[0], logins))
-    if login not in logins:
-        return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
     try:
-        hashed = cur.execute(f'select password from user where login="{login}"').fetchall()[0][0]
-        salt = cur.execute(f'select salt from salts where login="{login}"')
-        salt = list(map(lambda x: x[0], salt))[0]
-    except:
-        return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
-    eq_pass = verify_password(password, salt, hashed)
-    if not eq_pass:
-        return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+        data = request.get_json()
+        login = data['login']
+        password = data['password']
+        key = data['key']
 
-    logins = cur.execute(f'select logins from test where key="{key}"').fetchall()[0][0]
-    if logins is None:
-        logins = []
-    else:
-        logins = ast.literal_eval(logins)
-    usernames = []
-    for login in logins:
-        username = cur.execute(f'select username from user where login="{login}"').fetchall()[0][0]
-        usernames.append(username)
-    return jsonify({"logins": logins, 'usernames': usernames}), 200
+        con = sqlite3.connect('database.db')
+        cur = con.cursor()
+
+        logins = cur.execute('select login from user where id > 0').fetchall()
+        logins = list(map(lambda x: x[0], logins))
+        if login not in logins:
+            return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+        try:
+            hashed = cur.execute(f'select password from user where login="{login}"').fetchall()[0][0]
+            salt = cur.execute(f'select salt from salts where login="{login}"')
+            salt = list(map(lambda x: x[0], salt))[0]
+        except:
+            return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+        eq_pass = verify_password(password, salt, hashed)
+        if not eq_pass:
+            return jsonify({"message": "Что-то не так с вашей учётной записью"}), 300
+
+        logins = cur.execute(f'select logins from test where key="{key}"').fetchall()[0][0]
+        if logins is None:
+            logins = []
+        else:
+            logins = ast.literal_eval(logins)
+        usernames = []
+        for login in logins:
+            username = cur.execute(f'select username from user where login="{login}"').fetchall()[0][0]
+            usernames.append(username)
+        return jsonify({"logins": logins, 'usernames': usernames}), 200
+    except:
+        return jsonify({"message": "Упс, что-то пошло не так..."}), 500
 
 
 @app.route('/big_update', methods=['POST'])

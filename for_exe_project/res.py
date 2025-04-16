@@ -370,7 +370,7 @@ class Ui_Res(object):
         self.label.setStyleSheet("font: 75 20pt \"MS Shell Dlg 2\";")
         self.label.setObjectName("label")
         self.textBrowser = QtWidgets.QTextBrowser(self.centralwidget)
-        self.textBrowser.setEnabled(False)
+        self.textBrowser.setEnabled(True)
         self.textBrowser.setGeometry(QtCore.QRect(100, 90, 441, 411))
         self.textBrowser.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.textBrowser.setObjectName("textBrowser")

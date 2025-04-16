@@ -1,3 +1,5 @@
+import os
+
 import requests
 import json
 import random
@@ -5,9 +7,9 @@ import string
 import re
 import sys
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QPropertyAnimation, QEasingCurve, QTimer
 from PyQt5.QtWidgets import QApplication, QFileDialog, QDialog, QVBoxLayout, QGraphicsView, QGraphicsScene, \
-    QGraphicsPixmapItem, QPushButton, QHBoxLayout
+    QGraphicsPixmapItem, QPushButton, QHBoxLayout, QWidget, QFrame, QLabel, QGraphicsOpacityEffect
 from PyQt5.QtWidgets import QMainWindow
 from log_in import *
 from new_test import *
@@ -19,7 +21,7 @@ from res import *
 from teacher_menu import *
 from choose_work import *
 from check_form import *
-from PyQt5.QtGui import QPixmap, QKeyEvent
+from PyQt5.QtGui import QPixmap, QKeyEvent, QIcon
 
 host = 'http://127.0.0.1:5000'
 
@@ -75,6 +77,178 @@ def post_images(files, url):
     return response
 
 
+class Notification(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+        self.setup_animation()
+
+    def setup_ui(self):
+        # Основные настройки окна
+        self.setWindowFlags(
+            Qt.FramelessWindowHint |
+            Qt.WindowStaysOnTopHint |
+            Qt.Tool
+        )
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setFixedSize(400, 200)
+
+        # Контейнер уведомления
+        self.container = QFrame(self)
+        self.container.setStyleSheet("""
+            QFrame {
+                background-color: #2E2E2E;
+                border-radius: 8px;
+                border: 1px solid #4A4A4A;
+            }
+        """)
+
+        # Макет
+        layout = QVBoxLayout(self.container)
+        layout.setContentsMargins(15, 10, 15, 10)
+
+        # Заголовок и текст
+        self.title_label = QLabel("Уведомление")
+        self.title_label.setStyleSheet("""
+            QLabel {
+                color: #FFFFFF;
+                font-weight: bold;
+                font-size: 14px;
+            }
+        """)
+
+        self.message_label = QLabel("Сообщение")
+        self.message_label.setStyleSheet("""
+            QLabel {
+                color: #CCCCCC;
+                font-size: 12px;
+            }
+        """)
+        self.message_label.setWordWrap(True)
+
+        # Кнопка закрытия
+        self.close_btn = QPushButton("×")
+        self.close_btn.setFixedSize(20, 20)
+        self.close_btn.setStyleSheet("""
+            QPushButton {
+                color: #AAAAAA;
+                font-size: 16px;
+                font-weight: bold;
+                border: none;
+                background: transparent;
+            }
+            QPushButton:hover {
+                color: #FFFFFF;
+            }
+        """)
+        self.close_btn.clicked.connect(self.hide_notification)
+
+        # Расположение элементов
+        header_layout = QHBoxLayout()
+        header_layout.addWidget(self.title_label)
+        header_layout.addStretch()
+        header_layout.addWidget(self.close_btn)
+
+        layout.addLayout(header_layout)
+        layout.addWidget(self.message_label)
+
+        # Основной макет
+        main_layout = QVBoxLayout(self)
+        main_layout.addWidget(self.container)
+        self.setLayout(main_layout)
+
+        # Эффект прозрачности
+        self.opacity_effect = QGraphicsOpacityEffect()
+        self.setGraphicsEffect(self.opacity_effect)
+        self.opacity_effect.setOpacity(1.0)
+
+    def setup_animation(self):
+        # Анимация появления/исчезания
+        self.fade_animation = QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.fade_animation.setDuration(300)
+        self.fade_animation.setEasingCurve(QEasingCurve.InOutQuad)
+
+        # Таймер автоскрытия
+        self.timer = QTimer()
+        self.timer.setSingleShot(True)
+        self.timer.timeout.connect(self.hide_notification)
+
+    def show_notification(self, title, message, duration=3000, position=None, center_on_parent=True):
+        """Показать уведомление"""
+        self.title_label.setText(title)
+        self.message_label.setText(message)
+
+        # Обновленное позиционирование
+        if center_on_parent and self.parent():
+            # Центр родительского окна
+            parent_center = self.parent().geometry().center()
+            self.move(parent_center - self.rect().center())
+        else:
+            # Центр экрана
+            screen_center = self.screen().availableGeometry().center()
+            self.move(screen_center - self.rect().center())
+
+        # Анимация и показ (без изменений)
+        self.fade_animation.stop()
+        self.fade_animation.setStartValue(0)
+        self.fade_animation.setEndValue(1)
+        self.fade_animation.start()
+
+        self.show()
+
+        # Автоскрытие
+        if duration > 0:
+            self.timer.start(duration)
+
+    def hide_notification(self):
+        """Скрыть уведомление с анимацией"""
+        self.fade_animation.stop()
+        self.fade_animation.setStartValue(1)
+        self.fade_animation.setEndValue(0)
+        self.fade_animation.finished.connect(self.close)
+        self.fade_animation.start()
+
+    def mousePressEvent(self, event):
+        """Закрыть при клике"""
+        self.hide_notification()
+
+    def set_theme(self, theme="dark"):
+        """Установить тему (dark/light)"""
+        if theme == "light":
+            self.container.setStyleSheet("""
+                QFrame {
+                    background-color: #FFFFFF;
+                    border-radius: 8px;
+                    border: 1px solid #DDDDDD;
+                }
+            """)
+            self.title_label.setStyleSheet("""
+                QLabel {
+                    color: #333333;
+                    font-weight: bold;
+                    font-size: 14px;
+                }
+            """)
+            self.message_label.setStyleSheet("""
+                QLabel {
+                    color: #666666;
+                    font-size: 12px;
+                }
+            """)
+            self.close_btn.setStyleSheet("""
+                QPushButton {
+                    color: #666666;
+                    font-size: 16px;
+                    font-weight: bold;
+                    border: none;
+                    background: transparent;
+                }
+                QPushButton:hover {
+                    color: #000000;
+                }
+            """)
+
+
 class FirstMenu(QMainWindow, Ui_start):
     def __init__(self):
         super().__init__()
@@ -82,10 +256,15 @@ class FirstMenu(QMainWindow, Ui_start):
         self.setupUi(self)
         self.log_in.clicked.connect(self.log)
         self.registration.clicked.connect(self.reg)
-        # self.pixmap = QPixmap('my.png').scaled(300, 300)
-        # self.label.resize(300, 300)
-        # self.label.move(100, 300)
-        # self.label.setPixmap(self.pixmap)
+        self.setWindowTitle('Testify')
+
+        s = '/'
+        filename = f'../images{s}icon'
+        response = get_img({'filename': filename, 'login': "teacher3", 'password': "Qwerty2008@"}, '/send_image')
+        if response != '0':
+            pixmap = QPixmap()
+            pixmap.loadFromData(response.content)
+            self.setWindowIcon(QIcon(pixmap))
 
     def log(self):
         self.next_form = LogIn()
@@ -105,6 +284,15 @@ class LogIn(QMainWindow, Ui_log_in):
         self.setupUi(self)
         self.log_in_button.clicked.connect(self.click)
         self.pushButton.clicked.connect(self.back)
+        self.notification = Notification(self)
+        self.setWindowTitle('Testify')
+        s = '/'
+        filename = f'../images{s}icon'
+        response = get_img({'filename': filename, 'login': "teacher3", 'password': "Qwerty2008@"}, '/send_image')
+        if response != '0':
+            pixmap = QPixmap()
+            pixmap.loadFromData(response.content)
+            self.setWindowIcon(QIcon(pixmap))
 
     def back(self):
         self.new_form = FirstMenu()
@@ -120,7 +308,13 @@ class LogIn(QMainWindow, Ui_log_in):
         if response.status_code != 200:
             self.login.setText('')
             self.password.setText('')
-            self.statusbar.showMessage(response.json()['message'])
+            self.notification.show_notification(
+                "Неуспешно",
+                response.json()['message'],
+                duration=4000,
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
         data = response.json()
         status = data['status']
@@ -149,6 +343,15 @@ class TeacherMenu(QMainWindow, Ui_TeacherMenu):
         self.see_works_button.clicked.connect(self.see_works)
         self.pushButton_4.clicked.connect(self.check_work)
         self.back_button.clicked.connect(self.back)
+        self.notification = Notification(self)
+        self.setWindowTitle('Testify')
+        s = '/'
+        filename = f'../images{s}icon'
+        response = get_img({'filename': filename, 'login': "teacher3", 'password': "Qwerty2008@"}, '/send_image')
+        if response != '0':
+            pixmap = QPixmap()
+            pixmap.loadFromData(response.content)
+            self.setWindowIcon(QIcon(pixmap))
 
     def create_work(self):
         data = {'login': self.login,
@@ -156,7 +359,13 @@ class TeacherMenu(QMainWindow, Ui_TeacherMenu):
 
         response = post_in_db(data, '/log_in')
         if response.status_code != 200:
-            self.statusbar.showMessage(response.json()['message'])
+            self.notification.show_notification(
+                "Неуспешно",
+                response.json()['message'],
+                duration=3500,
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
         self.new_form = NewTest(self.login, self.password)
         self.new_form.show()
@@ -168,7 +377,13 @@ class TeacherMenu(QMainWindow, Ui_TeacherMenu):
 
         response = post_in_db(data, '/log_in')
         if response.status_code != 200:
-            self.statusbar.showMessage(response.json()['message'])
+            self.notification.show_notification(
+                "Неуспешно",
+                response.json()['message'],
+                duration=3500,
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
         self.new_form = Results(self.login, self.password)
         self.new_form.show()
@@ -181,7 +396,13 @@ class TeacherMenu(QMainWindow, Ui_TeacherMenu):
 
         response = post_in_db(data, '/to_check_work')
         if response.status_code != 200:
-            self.statusbar.showMessage(response.json()['message'])
+            self.notification.show_notification(
+                "Неуспешно",
+                response.json()['message'],
+                duration=3500,
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
         self.new_form = ChooseWork(self.login, self.password, self.codeEdit_2.text())
         self.new_form.show()
@@ -208,11 +429,25 @@ class ChooseWork(QMainWindow, Ui_ChooseWork):
         self.usernames = response.json()['usernames']
         self.comboBox.addItems(self.usernames)
         self.satrt_check_button.clicked.connect(self.start_check)
+        self.back_button.clicked.connect(self.back)
+        self.setWindowTitle('Testify')
+        s = '/'
+        filename = f'../images{s}icon'
+        response = get_img({'filename': filename, 'login': "teacher3", 'password': "Qwerty2008@"}, '/send_image')
+        if response != '0':
+            pixmap = QPixmap()
+            pixmap.loadFromData(response.content)
+            self.setWindowIcon(QIcon(pixmap))
 
     def start_check(self):
         username = self.comboBox.currentText()
         login = self.logins[self.usernames.index(username)]
         self.new_form = CheckForm(self.login, self.password, self.key, login)
+        self.new_form.show()
+        self.close()
+
+    def back(self):
+        self.new_form = TeacherMenu(self.login, self.password)
         self.new_form.show()
         self.close()
 
@@ -235,13 +470,29 @@ class CheckForm(QMainWindow, Ui_CheckForm):
         self.points = resp_j['points']
         self.pre = resp_j['pre']
         self.index = -1
+        self.notification = Notification(self)
         for i in range(len(self.pre)):
             if self.pre[i][0] == self.userlogin:
                 self.index = i
         if self.index == -1:
-            self.statusbar.showMessage('Логин ученика не найден')
+            self.notification.show_notification(
+                "Неуспешно",
+                'Логин ученика не найден',
+                duration=3500,
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
         self.current_qwe = 0
+
+        self.setWindowTitle('Testify')
+        s = '/'
+        filename = f'../images{s}icon'
+        response = get_img({'filename': filename, 'login': "teacher3", 'password': "Qwerty2008@"}, '/send_image')
+        if response != '0':
+            pixmap = QPixmap()
+            pixmap.loadFromData(response.content)
+            self.setWindowIcon(QIcon(pixmap))
 
         self.qwestionEdit.setText(self.questions[self.current_qwe])
         self.answerEdit.setText(self.answers[self.current_qwe])
@@ -351,14 +602,29 @@ class CheckForm(QMainWindow, Ui_CheckForm):
         data = {'login': self.login, 'res': self.pre, 'key': self.key, 'password': self.password}
         response = post_in_db(data, '/big_update')
         if response.status_code == 200:
-            self.statusbar.showMessage('Работа проверена')
+            self.notification.show_notification(
+                "Успех",
+                'Работа проверена',
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
         else:
-            self.statusbar.showMessage(response.json()['message'])
+            self.notification.show_notification(
+                "Неуспешно",
+                response.json()['message'],
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
 
     def preview(self):
         if self.current_qwe == 0:
-            self.statusbar.showMessage('Некорректный запрос')
+            self.notification.show_notification(
+                "Неуспешно",
+                "Это уже первый вопрос.",
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
         self.pre[self.index][1][self.current_qwe][0] = int(self.comboBox.currentText())
         self.current_qwe -= 1
@@ -392,8 +658,13 @@ class CheckForm(QMainWindow, Ui_CheckForm):
             self.userimageLabel.mousePressEvent = lambda event: self.view_image("temp_image.jpg")
 
     def next(self):
-        if self.current_qwe == len(self.questions):
-            self.statusbar.showMessage('Некорректный запрос.')
+        if self.current_qwe == len(self.questions) - 1:
+            self.notification.show_notification(
+                "Неуспешно",
+                "Это уже последний вопрос.",
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
         self.pre[self.index][1][self.current_qwe][0] = int(self.comboBox.currentText())
         self.current_qwe += 1
@@ -434,6 +705,15 @@ class Registration(QMainWindow, Ui_Registration):
         self.setupUi(self)
         self.registration_button.clicked.connect(self.click)
         self.pushButton.clicked.connect(self.back)
+        self.notification = Notification(self)
+        self.setWindowTitle('Testify')
+        s = '/'
+        filename = f'../images{s}icon'
+        response = get_img({'filename': filename, 'login': "teacher3", 'password': "Qwerty2008@"}, '/send_image')
+        if response != '0':
+            pixmap = QPixmap()
+            pixmap.loadFromData(response.content)
+            self.setWindowIcon(QIcon(pixmap))
 
     def back(self):
         self.new_form = FirstMenu()
@@ -443,14 +723,24 @@ class Registration(QMainWindow, Ui_Registration):
     def click(self):
         if self.loginEdit.text() == '' or self.password1Edit.text() == '' \
                 or self.password1Edit.text() != self.password2Edit.text() or self.usernameEdit.text() == '':
-            self.statusbar.showMessage('Неправильные данные')
+            self.notification.show_notification(
+                "Неуспешно.",
+                "Введённые данные некорректны",
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             self.loginEdit.setText('')
             self.password1Edit.setText('')
             self.password2Edit.setText('')
             return
 
         if password_level(self.password1Edit.text()) != 'ok':
-            self.statusbar.showMessage(password_level(self.password1Edit.text()))
+            self.notification.show_notification(
+                "Неуспешно.",
+                password_level(self.password1Edit.text()),
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
         data = {'login': self.loginEdit.text(),
                 'password': self.password1Edit.text(),
@@ -459,7 +749,12 @@ class Registration(QMainWindow, Ui_Registration):
         response = post_in_db(data, '/registration')
         if response.status_code != 200:
             data = response.json()
-            self.statusbar.showMessage(data['message'])
+            self.notification.show_notification(
+                "Неуспешно",
+                data['message'],
+                duration=4000
+            )
+            self.notification = Notification(self)
             return
         self.new_form = LogIn()
         self.new_form.show()
@@ -474,8 +769,17 @@ class StudentMenu(QMainWindow, Ui_StudentMenu):
         self.setupUi(self)
         self.login = login
         self.password = password
+        self.notification = Notification(self)
         self.startTestButton.clicked.connect(self.click)
         self.pushButton.clicked.connect(self.back)
+        self.setWindowTitle('Testify')
+        s = '/'
+        filename = f'../images{s}icon'
+        response = get_img({'filename': filename, 'login': "teacher3", 'password': "Qwerty2008@"}, '/send_image')
+        if response != '0':
+            pixmap = QPixmap()
+            pixmap.loadFromData(response.content)
+            self.setWindowIcon(QIcon(pixmap))
 
     def back(self):
         self.new_form = LogIn()
@@ -488,7 +792,12 @@ class StudentMenu(QMainWindow, Ui_StudentMenu):
                 'key': self.codeEdit.text()}
         response = post_in_db(data, '/student_menu')
         if response.status_code != 200:
-            self.statusbar.showMessage(response.json()['message'])
+            self.notification.show_notification(
+                "Неуспешно.",
+                response.json()['message'],
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
         self.next_form = Tester(self.login, self.password, self.codeEdit.text())
         self.next_form.show()
@@ -517,16 +826,29 @@ class NewTest(QMainWindow, Ui_NewTest):
         self.all_works_button.clicked.connect(self.all_works)
         self.comboBox.setCurrentIndex(0)
         self.one_back_button.clicked.connect(self.one_back)
-
+        self.notification = Notification(self)
         self.current_index = 0
         self.points = []
         self.questions = []
         self.answers = []
         self.image = {}
+        self.setWindowTitle('Testify')
+        s = '/'
+        filename = f'../images{s}icon'
+        response = get_img({'filename': filename, 'login': "teacher3", 'password': "Qwerty2008@"}, '/send_image')
+        if response != '0':
+            pixmap = QPixmap()
+            pixmap.loadFromData(response.content)
+            self.setWindowIcon(QIcon(pixmap))
 
     def one_back(self):
         if self.current_index == 0:
-            self.statusbar.showMessage('Это первый вопрос, невозможно открыть предыдущий')
+            self.notification.show_notification(
+                "Неуспешно",
+                "Это уже первый вопрос",
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
         self.current_index -= 1
         self.qwestionEdit.setText(self.questions[self.current_index])
@@ -538,7 +860,12 @@ class NewTest(QMainWindow, Ui_NewTest):
         clipboard = QApplication.clipboard()
         clipboard.setText(text)
         self.copied = True
-        self.statusbar.showMessage('Код скопирован.')
+        self.notification.show_notification(
+            "Успех",
+            'Код скопирован.',
+            position=self.mapToGlobal(self.rect().topRight())
+        )
+        self.notification = Notification(self)
 
     def load_image(self):
         options = QFileDialog.Options()
@@ -561,9 +888,12 @@ class NewTest(QMainWindow, Ui_NewTest):
 
     def add(self):
         if self.answerEdit.text() == '' or self.qwestionEdit.toPlainText() == '':
-            self.statusbar.showMessage('Некорректные данные')
-            self.qwestionEdit.setText('')
-            self.answerEdit.setText('')
+            self.notification.show_notification(
+                "Неуспешно.",
+                "Пустое поле вопрос или ответ.",
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
 
         if len(self.questions) == self.current_index:
@@ -583,21 +913,37 @@ class NewTest(QMainWindow, Ui_NewTest):
             self.answerEdit.setText(self.answers[self.current_index + 1])
             self.comboBox.setCurrentText(self.points[self.current_index + 1])
         self.current_index += 1
-
-        self.statusbar.showMessage('Вопрос добавлен')
+        self.notification.show_notification(
+            "Успех",
+            'Вопрос добавлен',
+            position=self.mapToGlobal(self.rect().topRight())
+        )
+        self.notification = Notification(self)
 
     def load(self):
         if not self.copied:
-            self.statusbar.showMessage('Скопируйте код.')
+            self.notification.show_notification(
+                "Неуспешно.",
+                'Код не скопирован',
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
         if self.name_of_work.text() == '':
-            self.statusbar.showMessage('Напишите название работы.')
+            self.notification.show_notification(
+                "Неуспешно.",
+                'Напишите название работы.',
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
         if len(self.answers) == 0:
-            self.statusbar.showMessage('Нет вопросов')
-            return
-        if self.codeEdit.text() == '':
-            self.statusbar.showMessage('Пустое поле кода теста')
+            self.notification.show_notification(
+                "Неуспешно.",
+                'Добавьте вопросы.',
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
         data = {'login': self.login,
                 'password': self.password,
@@ -608,15 +954,32 @@ class NewTest(QMainWindow, Ui_NewTest):
                 'points': self.points}  # add pictures
         response = post_in_db(data, '/new_test')
         if response.status_code != 200:
-            self.statusbar.showMessage(response.json()['message'])
+            self.notification.show_notification(
+                "Неуспешно.",
+                response.json()['message'],
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
         else:
             response = post_images(self.image,
                                    f'/load_images/{self.codeEdit.text()}/{self.login}/{self.password}' + '/teacher')
             if response.status_code == 200:
-                self.statusbar.showMessage(response.json()['message'])
+                self.notification.show_notification(
+                    "Успех",
+                    response.json()['message'],
+                    position=self.mapToGlobal(self.rect().topRight())
+                )
+                self.notification = Notification(self)
+                return
             else:
-                self.statusbar.showMessage(response.json()['message'])
+                self.notification.show_notification(
+                    "Неуспешно.",
+                    response.json()['message'],
+                    position=self.mapToGlobal(self.rect().topRight())
+                )
+                self.notification = Notification(self)
+                return
 
 
 class Results(QMainWindow, Ui_Res):
@@ -629,6 +992,15 @@ class Results(QMainWindow, Ui_Res):
         self.password = password
         self.setupUi(self)
         self.pushButton.clicked.connect(self.back)
+        self.notification = Notification(self)
+        self.setWindowTitle('Testify')
+        s = '/'
+        filename = f'../images{s}icon'
+        response = get_img({'filename': filename, 'login': "teacher3", 'password': "Qwerty2008@"}, '/send_image')
+        if response != '0':
+            pixmap = QPixmap()
+            pixmap.loadFromData(response.content)
+            self.setWindowIcon(QIcon(pixmap))
         data = {'login': self.login,
                 'password': self.password,
                 }
@@ -637,16 +1009,22 @@ class Results(QMainWindow, Ui_Res):
         if response.status_code == 200:
             self.textBrowser.setText(response.json()['message'])
         else:
-            self.statusbar.showMessage(response.json()['message'])
+            self.notification.show_notification(
+                "Неуспешно.",
+                response.json()['message'],
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
 
     def back(self):
-        self.new_form = NewTest(self.login, self.password)
+        self.new_form = TeacherMenu(self.login, self.password)
         self.new_form.show()
         self.close()
 
 
 class Tester(QMainWindow, Ui_Tester):
+
     def __init__(self, login, password, key):
         super().__init__()
         self.setupUi(self)
@@ -654,8 +1032,16 @@ class Tester(QMainWindow, Ui_Tester):
         self.key = key
         self.password = password
         self.results = []
+        self.notification = Notification(self)
         # Внутри test пары вопрос ответ через *** а внутри через ,,,,
-
+        self.setWindowTitle('Testify')
+        s = '/'
+        filename = f'../images{s}icon'
+        response = get_img({'filename': filename, 'login': "teacher3", 'password': "Qwerty2008@"}, '/send_image')
+        if response != '0':
+            pixmap = QPixmap()
+            pixmap.loadFromData(response.content)
+            self.setWindowIcon(QIcon(pixmap))
         data = {'login': self.login,
                 'password': self.password,
                 'key': self.key}
@@ -696,6 +1082,12 @@ class Tester(QMainWindow, Ui_Tester):
                                                     "Images (*.png *.jpg *.bmp);;All Files (*)", options=options)
         try:
             self.image[str(self.current_qwe)] = open(image_path, 'rb')
+            self.notification.show_notification(
+                "Успешно.",
+                "Изображение выбрано.",
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
         except FileNotFoundError:
             print('Отмена при выборе изображения')
 
@@ -769,14 +1161,23 @@ class Tester(QMainWindow, Ui_Tester):
         self.close()
 
     def save(self):
-        self.statusbar.showMessage('')
         self.user_answers[self.current_qwe] = self.answerEdit.text()
+        self.notification.show_notification(
+            "Успешно.",
+            "Сохранено",
+            position=self.mapToGlobal(self.rect().topRight())
+        )
+        self.notification = Notification(self)
 
     def preview(self):
         if self.current_qwe == 0:
-            self.statusbar.showMessage('Некорректный запрос')
+            self.notification.show_notification(
+                "Неуспешно.",
+                'Это уже первый вопрос.',
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
-        self.statusbar.showMessage('')
         self.current_qwe = self.current_qwe - 1
         self.qwestionText.setText(self.questions[self.current_qwe])
         self.answerEdit.setText(self.user_answers[self.current_qwe])
@@ -793,9 +1194,13 @@ class Tester(QMainWindow, Ui_Tester):
 
     def next(self):
         if self.current_qwe + 1 > self.max_qwe:
-            self.statusbar.showMessage('Некорректный запрос')
+            self.notification.show_notification(
+                "Неуспешно.",
+                'Это уже последний вопрос.',
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
-        self.statusbar.showMessage('')
         self.current_qwe = self.current_qwe + 1
         self.qwestionText.setText(self.questions[self.current_qwe])
         self.answerEdit.setText(self.user_answers[self.current_qwe])
@@ -825,15 +1230,30 @@ class Tester(QMainWindow, Ui_Tester):
                 'key': self.key}
         response = post_in_db(data, '/update_results')
         if response.status_code != 200:
-            self.statusbar.showMessage(response.json()['message'])
+            self.notification.show_notification(
+                "Неуспешно.",
+                response.json()['message'],
+                position=self.mapToGlobal(self.rect().topRight())
+            )
+            self.notification = Notification(self)
             return
         else:
             response = post_images(self.image,
                                    f'/load_images/{self.key}/{self.login}/{self.password}' + '/user')
             if response.status_code == 200:
-                self.statusbar.showMessage(response.json()['message'])
+                self.notification.show_notification(
+                    "Успех",
+                    response.json()['message'],
+                    position=self.mapToGlobal(self.rect().topRight())
+                )
+                self.notification = Notification(self)
             else:
-                self.statusbar.showMessage(response.json()['message'])
+                self.notification.show_notification(
+                    "Неуспешно.",
+                    response.json()['message'],
+                    position=self.mapToGlobal(self.rect().topRight())
+                )
+                self.notification = Notification(self)
             return
 
 
@@ -842,6 +1262,12 @@ def except_hook(cls, exception, traceback):
 
 
 if __name__ == '__main__':
+    if sys.platform == "win32":
+        import ctypes
+
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myapp.1.0")
+        myappid = 'mycompany.myapp.1.0'  # Произвольный идентификатор
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
     app = QApplication(sys.argv)
     ex = FirstMenu()
     ex.show()

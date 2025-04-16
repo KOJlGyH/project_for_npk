@@ -186,8 +186,18 @@ def post_in_db(data, url):
 
 
 def sign_up(message):
-    login, password = message.text.split()
-    print(login, password)
+    flag = 0
+    try:
+        login, password = message.text.split()
+    except:
+        markup = types.InlineKeyboardMarkup()
+        reg = types.InlineKeyboardButton('Попробовать ещё', callback_data='chance')
+        back_to_menu = types.InlineKeyboardButton('Вернуться в меню', callback_data='back')
+        markup.add(reg)
+        markup.add(back_to_menu)
+
+        bot.send_message(message.chat.id, 'Вы явно что-то делаете не так... Вы уверены что вводите логин и пароль через пробел и ничего лишнего, ведь так?', reply_markup=markup)
+        flag = 1
     # password = sha256_hash(password)
 
     markup = types.InlineKeyboardMarkup()
@@ -199,9 +209,9 @@ def sign_up(message):
     data = {'login': login,
             'password': password}
     response = post_in_db(data, '/log_in')
-    if response.status_code != 200:
+    if response.status_code != 200 and flag == 0:
         bot.send_message(message.chat.id, 'Неправильный логин или пароль', reply_markup=markup)
-    else:
+    elif flag == 0:
         data = {'login': login,
                 'chat_id': message.chat.id,
                 'password': password}
