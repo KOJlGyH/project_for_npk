@@ -8,7 +8,7 @@ from openpyxl.utils import get_column_letter
 from openpyxl.styles.numbers import FORMAT_NUMBER_00
 from io import BytesIO
 
-bot = telebot.TeleBot('7635382318:AAEJS3sTRkzhQ32c86asRf7L-nQYX4o-fv8')
+bot = telebot.TeleBot('token')
 # host = 'http://127.0.0.1:5000'
 host = 'https://KOJlGylHl.pythonanywhere.com'
 
