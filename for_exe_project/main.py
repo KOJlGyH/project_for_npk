@@ -84,7 +84,6 @@ class Notification(QWidget):
         self.setup_animation()
 
     def setup_ui(self):
-        # Основные настройки окна
         self.setWindowFlags(
             Qt.FramelessWindowHint |
             Qt.WindowStaysOnTopHint |
@@ -93,7 +92,6 @@ class Notification(QWidget):
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setFixedSize(400, 200)
 
-        # Контейнер уведомления
         self.container = QFrame(self)
         self.container.setStyleSheet("""
             QFrame {
@@ -106,8 +104,6 @@ class Notification(QWidget):
         # Макет
         layout = QVBoxLayout(self.container)
         layout.setContentsMargins(15, 10, 15, 10)
-
-        # Заголовок и текст
         self.title_label = QLabel("Уведомление")
         self.title_label.setStyleSheet("""
             QLabel {
@@ -125,8 +121,6 @@ class Notification(QWidget):
             }
         """)
         self.message_label.setWordWrap(True)
-
-        # Кнопка закрытия
         self.close_btn = QPushButton("×")
         self.close_btn.setFixedSize(20, 20)
         self.close_btn.setStyleSheet("""
@@ -143,7 +137,6 @@ class Notification(QWidget):
         """)
         self.close_btn.clicked.connect(self.hide_notification)
 
-        # Расположение элементов
         header_layout = QHBoxLayout()
         header_layout.addWidget(self.title_label)
         header_layout.addStretch()
@@ -152,23 +145,17 @@ class Notification(QWidget):
         layout.addLayout(header_layout)
         layout.addWidget(self.message_label)
 
-        # Основной макет
         main_layout = QVBoxLayout(self)
         main_layout.addWidget(self.container)
         self.setLayout(main_layout)
-
-        # Эффект прозрачности
         self.opacity_effect = QGraphicsOpacityEffect()
         self.setGraphicsEffect(self.opacity_effect)
         self.opacity_effect.setOpacity(1.0)
 
     def setup_animation(self):
-        # Анимация появления/исчезания
         self.fade_animation = QPropertyAnimation(self.opacity_effect, b"opacity")
         self.fade_animation.setDuration(300)
         self.fade_animation.setEasingCurve(QEasingCurve.InOutQuad)
-
-        # Таймер автоскрытия
         self.timer = QTimer()
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.hide_notification)
@@ -178,17 +165,14 @@ class Notification(QWidget):
         self.title_label.setText(title)
         self.message_label.setText(message)
 
-        # Обновленное позиционирование
         if center_on_parent and self.parent():
             # Центр родительского окна
             parent_center = self.parent().geometry().center()
             self.move(parent_center - self.rect().center())
         else:
-            # Центр экрана
             screen_center = self.screen().availableGeometry().center()
             self.move(screen_center - self.rect().center())
 
-        # Анимация и показ (без изменений)
         self.fade_animation.stop()
         self.fade_animation.setStartValue(0)
         self.fade_animation.setEndValue(1)
@@ -201,7 +185,6 @@ class Notification(QWidget):
             self.timer.start(duration)
 
     def hide_notification(self):
-        """Скрыть уведомление с анимацией"""
         self.fade_animation.stop()
         self.fade_animation.setStartValue(1)
         self.fade_animation.setEndValue(0)
@@ -209,11 +192,9 @@ class Notification(QWidget):
         self.fade_animation.start()
 
     def mousePressEvent(self, event):
-        """Закрыть при клике"""
         self.hide_notification()
 
     def set_theme(self, theme="dark"):
-        """Установить тему (dark/light)"""
         if theme == "light":
             self.container.setStyleSheet("""
                 QFrame {
@@ -542,7 +523,6 @@ class CheckForm(QMainWindow, Ui_CheckForm):
         image_view.setScene(image_scene)
         main_layout.addWidget(image_view)
 
-        # Устанавливаем фокус на QGraphicsView для получения событий клавиатуры
         image_view.setFocusPolicy(Qt.StrongFocus)
         image_view.setFocus()
 
@@ -565,16 +545,13 @@ class CheckForm(QMainWindow, Ui_CheckForm):
             if event.modifiers() & Qt.ControlModifier:
                 if event.key() == Qt.Key_Left:
                     rotate_image(-90)
-                    event.accept()  # Помечаем событие как обработанное
+                    event.accept()
                     return
                 elif event.key() == Qt.Key_Right:
                     rotate_image(90)
                     event.accept()
                     return
-            # Для остальных случаев вызываем базовую обработку
             QGraphicsView.keyPressEvent(image_view, event)
-
-        # Переопределяем keyPressEvent для QGraphicsView
         image_view.keyPressEvent = keyPressEvent
 
         def wheelEvent(event):
@@ -584,7 +561,7 @@ class CheckForm(QMainWindow, Ui_CheckForm):
                     image_view.scale(1.2, 1.2)
                 else:
                     image_view.scale(0.8, 0.8)
-                event.accept()  # Помечаем событие как обработанное
+                event.accept()
             else:
                 QGraphicsView.wheelEvent(image_view, event)
 
